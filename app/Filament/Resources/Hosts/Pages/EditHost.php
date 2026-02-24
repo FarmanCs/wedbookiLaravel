@@ -1,0 +1,29 @@
+<?php
+
+namespace App\Filament\Resources\Hosts\Pages;
+
+use App\Filament\Resources\Hosts\HostResource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Pages\EditRecord;
+
+class EditHost extends EditRecord
+{
+    protected static string $resource = HostResource::class;
+
+    public function getHeading(): string
+    {
+        return 'Editing ' . $this->record->full_name;
+    }
+    protected function getHeaderActions(): array
+    {
+        return [
+            ViewAction::make(),
+            DeleteAction::make(),
+            ForceDeleteAction::make(),
+            RestoreAction::make(),
+        ];
+    }
+}
