@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use Database\Seeders\Admin\PermissionSeeder;
+use Database\Seeders\Admin\RoleSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,8 +13,8 @@ class DatabaseSeeder extends Seeder
         // First, seed independent tables
         $this->call([
             // Admin & Auth (no foreign dependencies)
-            \Database\Seeders\Admin\RoleSeeder::class,
-            \Database\Seeders\Admin\PermissionSeeder::class,
+            RoleSeeder::class,
+            PermissionSeeder::class,
             \Database\Seeders\Admin\AdminSeeder::class,
             \Database\Seeders\Auth\UserSeeder::class,
 
