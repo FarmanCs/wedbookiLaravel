@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Vendor\Vendors;
+namespace App\Livewire\Vendor\Payments;
 
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -10,6 +10,6 @@ class Index extends Component
 {
     public function render()
     {
-        return view('livewire.vendor.vendors.index');
+        return view('livewire.vendor.payments.index');
     }
 }

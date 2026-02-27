@@ -1,139 +1,186 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full" x-data="{
+    darkMode: localStorage.getItem('darkMode') === 'true' ? true : false,
+    toggleDark() { this.darkMode = !this.darkMode;
+        localStorage.setItem('darkMode', this.darkMode); },
+    init() { if (this.darkMode) document.documentElement.classList.add('dark'); }
+}" x-init="init();
+$watch('darkMode', val => document.documentElement.classList.toggle('dark', val))">
+
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-
-    <title>{{ $title ?? 'Vendor Dashboard - Wedbooki' }}</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ config('app.name', 'Wedbooki') }} - Vendor</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    @livewireStyles
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
 </head>
-<body class="antialiased dark app-body">
 
-<!-- Navbar -->
-<nav class="app-navbar">
-    <div class="navbar-container">
-        <!-- Logo -->
-        <div class="navbar-logo">
-            <div class="w-10 h-10 rounded-lg bg-blue-600 dark:bg-blue-500 flex items-center justify-center">
-                <span class="text-white font-bold text-lg">W</span>
-            </div>
-            <span class="text-xl font-bold text-zinc-900 dark:text-white hidden sm:inline">WEDBOOKI</span>
-        </div>
+<body class="h-full bg-gray-50 dark:bg-stone-900 text-gray-900 dark:text-gray-100 antialiased">
+    <div class="min-h-full flex flex-col">
+        <!-- Navbar -->
+        <nav class="bg-white dark:bg-stone-950 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Left: Brand & Navigation -->
+                    <div class="flex items-center space-x-8">
+                        <div class="flex-shrink-0">
+                            <a href="{{ route('vendor.dashboard') }}"
+                                class="text-2xl font-bold text-primary-600 dark:text-primary-400">WEDBOOKI</a>
+                        </div>
+                        <div class="hidden md:flex space-x-6">
+                            <a href="#"
+                                class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-medium">VENUES</a>
+                            <a href="#"
+                                class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-medium">VENDORS</a>
+                            <a href="#"
+                                class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-medium">PLANNING
+                                TOOLS</a>
+                        </div>
+                    </div>
 
-        <!-- Nav Links -->
-        <div class="navbar-nav">
-            <a href="{{ route('vendor.dashboard') }}" class="navbar-item navbar-item-active">Venues</a>
-            <a href="{{ route('vendor.vendors.index') }}" class="navbar-item">Vendors</a>
-            <a href="#" class="navbar-item">Planning Tools</a>
-        </div>
-
-        <!-- Right Section -->
-        <div class="navbar-actions">
-            <!-- Search -->
-            <div class="navbar-search hidden lg:block">
-                <input type="text" placeholder='Try "Four Seasons"' class="navbar-search-input">
-                <svg class="navbar-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-            </div>
-
-            <!-- Notifications -->
-            <button class="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition">
-                <svg class="w-6 h-6 text-zinc-700 dark:text-zinc-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                </svg>
-            </button>
-
-            <!-- Profile -->
-            <div class="navbar-profile">
-                <div class="navbar-profile-avatar">{{ substr(auth('vendor')->user()->full_name ?? 'A', 0, 1) }}</div>
-                <div class="navbar-profile-dropdown">
-                    <span class="navbar-profile-name">{{ substr(auth('vendor')->user()->full_name ?? 'Vendor', 0, 10) }}</span>
-                    <svg class="navbar-dropdown-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                    </svg>
+                    <!-- Right: Search, Currency, Dark Mode -->
+                    <div class="flex items-center space-x-4">
+                        <!-- Search -->
+                        <div class="relative hidden md:block">
+                            <x-heroicon-s-magnifying-glass
+                                class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input type="text" placeholder="Try 'Four Seasons' in Venues"
+                                class="pl-9 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500 w-64">
+                        </div>
+                        <!-- Currency -->
+                        <div class="flex items-center space-x-1 text-sm text-gray-700 dark:text-gray-300">
+                            <span>PK (PKR)</span>
+                            <x-heroicon-s-chevron-down class="w-4 h-4" />
+                        </div>
+                        <!-- Dark Mode Toggle -->
+                        <button @click="toggleDark()"
+                            class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700">
+                            <x-heroicon-s-moon class="w-5 h-5" x-show="!darkMode" />
+                            <x-heroicon-s-sun class="w-5 h-5" x-show="darkMode" x-cloak />
+                        </button>
+                        <!-- Mobile menu button (optional) -->
+                    </div>
                 </div>
             </div>
-        </div>
-    </div>
-</nav>
+        </nav>
 
-<!-- Tabs Navigation -->
-<div class="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex gap-8 overflow-x-auto">
-            <a href="{{ route('vendor.dashboard') }}" class="py-4 px-2 border-b-2 border-blue-600 dark:border-blue-500 text-blue-600 dark:text-blue-400 font-medium text-sm whitespace-nowrap transition">
-                <svg class="w-5 h-5 mb-1 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6z"></path>
-                </svg>
-                Dashboard
-            </a>
-            <a href="#" class="py-4 px-2 border-b-2 border-transparent text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-sm whitespace-nowrap transition">Calendar</a>
-            <a href="#" class="py-4 px-2 border-b-2 border-transparent text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-sm whitespace-nowrap transition">Messages</a>
-            <a href="#" class="py-4 px-2 border-b-2 border-transparent text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium text-sm whitespace-nowrap transition">Bookings</a>
-        </div>
-    </div>
-</div>
-
-<!-- Main Content -->
-<main class="app-body">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        {{ $slot }}
-
-    </div>
-</main>
-
-<!-- Footer -->
-<footer class="bg-white dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 mt-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="w-10 h-10 rounded-lg bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-bold">W</div>
-                    <span class="font-bold text-zinc-900 dark:text-white">WEDBOOKI</span>
-                </div>
-            </div>
-
-            <div>
-                <h3 class="font-bold text-zinc-900 dark:text-white mb-4">Policies</h3>
-                <ul class="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
-                    <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Privacy Policy</a></li>
-                    <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Terms of Service</a></li>
-                    <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Refund Policy</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h3 class="font-bold text-zinc-900 dark:text-white mb-4">Company</h3>
-                <ul class="space-y-2 text-sm text-zinc-600 dark:text-zinc-400">
-                    <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition">About Us</a></li>
-                    <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition">Pricing</a></li>
-                    <li><a href="#" class="hover:text-blue-600 dark:hover:text-blue-400 transition">FAQ</a></li>
-                </ul>
-            </div>
-
-            <div>
-                <h3 class="font-bold text-zinc-900 dark:text-white mb-4">Follow Us</h3>
-                <div class="flex gap-4">
-                    <a href="#" class="text-zinc-600 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition">
-                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
-                        </svg>
-                    </a>
+        <!-- Sub-navigation (Dashboard, Calendar, Messages, etc.) -->
+        <div class="dark:bg-stone-800 border-b border-gray-200 dark:border-gray-700 mb-2">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-6 overflow-x-auto py-3 text-sm font-medium">
+                    <a href="{{ route('vendor.dashboard') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.dashboard') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Dashboard</a>
+                    <a href="{{ route('vendor.calendar') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.calendar') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Calendar</a>
+                    <a href="{{ route('vendor.messages') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.messages') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Messages</a>
+                    <a href="{{ route('vendor.storefront') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.storefront') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Storefront</a>
+                    <a href="{{ route('vendor.payments') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.payments') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Payments</a>
+                    <a href="{{ route('vendor.reviews') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.reviews') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Reviews</a>
+                    <a href="{{ route('vendor.bookings') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.bookings') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Bookings</a>
+                    <a href="{{ route('vendor.analytics') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.analytics') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Analytics</a>
                 </div>
             </div>
         </div>
 
-        <div class="border-t border-zinc-200 dark:border-zinc-800 pt-8 text-center text-zinc-500 dark:text-zinc-400 text-sm">
-            <p>© 2025 Wedbooki. All rights reserved. Created & Managed by A Cube Creative Factory</p>
-        </div>
-    </div>
-</footer>
+        <!-- Main Content -->
+        <main class="flex-1">
+            {{ $slot }}
+        </main>
 
-@livewireScripts
+        <!-- Footer -->
+        <footer class="bg-white dark:bg-green-800 border-t border-gray-200 dark:border-gray-700 mt-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+                    <!-- App Column -->
+                    <div class="lg:col-span-2">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">GET THE WEDBOOKI APP</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4">Plan your event wherever and whenever you want
+                            on the Wedbooki app.</p>
+                        <div class="flex space-x-4">
+                            <a href="#" class="flex items-center bg-black text-white px-4 py-2 rounded-lg">
+                                <x-heroicon-s-computer-desktop class="w-5 h-5 mr-2" />
+                                Google Play
+                            </a>
+                            <a href="#" class="flex items-center bg-black text-white px-4 py-2 rounded-lg">
+                                <x-heroicon-s-device-phone-mobile class="w-5 h-5 mr-2" />
+                                App Store
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Policies -->
+                    <div>
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                            POLICIES & TERMS</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Account Deletion</a>
+                            </li>
+                            <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Help &
+                                    Support</a></li>
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Privacy Policy</a>
+                            </li>
+                            <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Refund
+                                    Policy</a></li>
+                            <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Terms
+                                    of Service</a></li>
+                            <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Vendor
+                                    Agreement</a></li>
+                        </ul>
+                    </div>
+                    <!-- Company -->
+                    <div>
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                            THE COMPANY</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600">About
+                                    us</a></li>
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">FAQ's</a></li>
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Pricing</a></li>
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Vendors</a></li>
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Venues</a></li>
+                        </ul>
+                    </div>
+                    <!-- Planning Tools -->
+                    <div>
+                        <h4 class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">
+                            PLANNING TOOLS</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Budget</a></li>
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Checklist</a></li>
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Guest list</a></li>
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Vendor manager</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div
+                    class="border-t border-gray-200 dark:border-gray-700 mt-8 pt-8 text-center text-gray-500 dark:text-gray-400 text-sm">
+                    © 2026 Wedbooki. All rights reserved. Created & Managed by A Cube Creative Factory
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    @stack('scripts')
 </body>
+
 </html>
