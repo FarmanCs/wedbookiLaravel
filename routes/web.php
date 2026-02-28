@@ -11,20 +11,34 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::prefix('vendor')->name('vendor.')->middleware('auth:vendor')->group(function () {
-    // Dashboard (already exists, rename if needed)
-    Route::get('/dashboard', \App\Livewire\Vendor\Dashboard\Index::class)->name('dashboard');
+Route::prefix('vendor')->name('vendor.')->group(function () {
+    // Guest Routes (Not Authenticated)
+    Route::middleware('guest')->group(function () {
+        Route::get('/signup', \App\Livewire\Vendor\Auth\VendorSignup::class)->name('signup');
+        Route::get('/verify-otp', \App\Livewire\Vendor\Auth\VendorVerifyOtp::class)->name('verify-otp');
+        Route::get('/login', \App\Livewire\Vendor\Auth\VendorLogin::class)->name('login');
+        Route::get('/forgot-password', function () {
+            return 'Forgot Password Page';
+        })->name('forgot-password');
+    });
+    // Authenticated Routes
+    Route::middleware('auth:vendor')->group(function () {
+        // Dashboard (already exists, rename if needed)
+        Route::get('/dashboard', \App\Livewire\Vendor\Dashboard\Index::class)->name('dashboard');
 
-    // New pages
-    Route::get('/calendar', \App\Livewire\Vendor\Calendar\Index::class)->name('calendar');
-    Route::get('/messages', \App\Livewire\Vendor\Messages\Index::class)->name('messages');
-    Route::get('/storefront', \App\Livewire\Vendor\Storefront\Index::class)->name('storefront');
-    Route::get('/payments', \App\Livewire\Vendor\Payments\Index::class)->name('payments');
-    Route::get('/reviews', \App\Livewire\Vendor\Reviews\Index::class)->name('reviews');
-    Route::get('/bookings', \App\Livewire\Vendor\Bookings\Index::class)->name('bookings');
-    Route::get('/analytics', \App\Livewire\Vendor\Analytics\Index::class)->name('analytics');
-    Route::get('/profile', \App\Livewire\Vendor\Profile\Index::class)->name('profile'); // For vendor profile editing
+        // New pages
+        Route::get('/calendar', \App\Livewire\Vendor\Calendar\Index::class)->name('calendar');
+        Route::get('/messages', \App\Livewire\Vendor\Messages\Index::class)->name('messages');
+        Route::get('/storefront', \App\Livewire\Vendor\Storefront\Index::class)->name('storefront');
+        Route::get('/payments', \App\Livewire\Vendor\Payments\Index::class)->name('payments');
+        Route::get('/reviews', \App\Livewire\Vendor\Reviews\Index::class)->name('reviews');
+        Route::get('/bookings', \App\Livewire\Vendor\Bookings\Index::class)->name('bookings');
+        Route::get('/analytics', \App\Livewire\Vendor\Analytics\Index::class)->name('analytics');
+        Route::get('/profile', \App\Livewire\Vendor\Profile\Index::class)->name('profile'); // For vendor profile editing
+    });
 });
+
+
 
 
 
@@ -61,15 +75,15 @@ Route::prefix('host')->name('host.')->group(function () {
         // Bookings
         Route::prefix('bookings')->name('bookings.')->group(function () {
             Route::get('/', \App\Livewire\Host\Bookings\Index::class)->name('index');
-//            Route::get('/create', \App\Livewire\Host\Bookings\Create::class)->name('create');
-//            Route::get('/{booking}', \App\Livewire\Host\Bookings\Show::class)->name('show');
-//            Route::get('/{booking}/edit', \App\Livewire\Host\Bookings\Edit::class)->name('edit');
+            //            Route::get('/create', \App\Livewire\Host\Bookings\Create::class)->name('create');
+            //            Route::get('/{booking}', \App\Livewire\Host\Bookings\Show::class)->name('show');
+            //            Route::get('/{booking}/edit', \App\Livewire\Host\Bookings\Edit::class)->name('edit');
         });
 
         // Guests
         Route::prefix('guests')->name('guests.')->group(function () {
             Route::get('/', \App\Livewire\Host\Guests\Index::class)->name('index');
-//            Route::get('/groups', \App\Livewire\Host\Guests\Groups::class)->name('groups');
+            //            Route::get('/groups', \App\Livewire\Host\Guests\Groups::class)->name('groups');
         });
 
         // Checklists
@@ -108,7 +122,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(
             when(
                 Features::canManageTwoFactorAuthentication()
-                && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
+                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
                 ['password.confirm'],
                 [],
             ),

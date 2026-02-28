@@ -57,7 +57,7 @@ return [
 
         'vendor' => [
             'driver' => 'session',
-            'provider' => 'vendor',
+            'provider' => 'vendors',
         ],
     ],
 
@@ -93,7 +93,7 @@ return [
             'model' => env('AUTH_MODEL', Host::class),
         ],
 
-        'vendor' => [
+        'vendors' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', Vendor::class),
         ],

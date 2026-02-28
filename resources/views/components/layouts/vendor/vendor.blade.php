@@ -69,7 +69,7 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
         </nav>
 
         <!-- Sub-navigation (Dashboard, Calendar, Messages, etc.) -->
-        <div class="dark:bg-stone-800 border-b border-gray-200 dark:border-gray-700 mb-2">
+        <div class="dark:bg-stone-800  dark:border-gray-700 mb-2">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex space-x-6 overflow-x-auto py-3 text-sm font-medium">
                     <a href="{{ route('vendor.dashboard') }}"
