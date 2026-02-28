@@ -215,4 +215,6 @@ class Vendor extends Authenticatable
     {
         return $this->bookings()->where('custom_booking_id', $customId)->first();
     }
+
+
 }
