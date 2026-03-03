@@ -17,7 +17,7 @@ class CreditPlanInfolist
                     ->schema([
                         ImageEntry::make('image')
                             ->label('Plan Image')
-                            ->disk('s3')
+                            ->disk('public')
                             ->visibility('public')
                             ->imageSize(200)
                             ->columnSpanFull(),

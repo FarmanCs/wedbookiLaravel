@@ -17,15 +17,11 @@ class CreditPlanForm
                 FileUpload::make('image')
                     ->label('Plan Image')
                     ->image()
-                    ->disk('s3')
+                    ->disk('public')
                     ->directory('credit-plans')
                     ->visibility('public')
                     ->imageEditor()
                     ->maxSize(2048)
-                    ->saveUploadedFileUsing(function ($file){
-                        $path = $file->storepublicly('categories', 's3');
-                        return Storage::disk('s3')->url($path);
-                    })
                     ->columnSpanFull(),
 
                 TextInput::make('name')

@@ -63,7 +63,6 @@ class DatabaseSeeder extends Seeder
             // Subscriptions & Plans
             \Database\Seeders\Subscription\PlanSeeder::class,
             \Database\Seeders\Subscription\CreditPlanSeeder::class,
-            \Database\Seeders\Feature\AdminPackageSeeder::class,
 
             // Many-to-many feature relationships
             \Database\Seeders\Feature\FeaturePackageSeeder::class,

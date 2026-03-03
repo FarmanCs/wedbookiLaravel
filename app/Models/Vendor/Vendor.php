@@ -15,21 +15,55 @@ class Vendor extends Authenticatable
     use HasFactory, Notifiable, SoftDeletes;
 
     protected $fillable = [
-        'full_name', 'email', 'phone_no', 'pending_email', 'country_code',
-        'profile_image', 'years_of_experience', 'languages', 'team_members',
-        'specialties', 'about', 'country', 'city', 'role', 'password',
-        'category_id', 'postal_code', 'otp', 'otp_attempts', 'otp_expires_at',
-        'otp_attempt_count', 'two_factor_code', 'two_factor_code_expires',
-        'remember_token', 'profile_verification', 'email_verified',
-        'stripe_account_id', 'bank_last4', 'bank_name', 'account_holder_name',
-        'payout_currency', 'custom_vendor_id', 'google_id', 'signup_method',
-        'cover_image', 'last_login', 'account_deactivated', 'is_active',
-        'account_soft_deleted', 'account_soft_deleted_at', 'auto_hard_delete_after_days',
+        'full_name',
+        'email',
+        'phone_no',
+        'pending_email',
+        'country_code',
+        'profile_image',
+        'years_of_experience',
+        'languages',
+        'team_members',
+        'specialties',
+        'about',
+        'country',
+        'city',
+        'role',
+        'password',
+        'category_id',
+        'postal_code',
+        'otp',
+        'otp_attempts',
+        'otp_expires_at',
+        'otp_attempt_count',
+        'two_factor_code',
+        'two_factor_code_expires',
+        'remember_token',
+        'profile_verification',
+        'email_verified',
+        'stripe_account_id',
+        'bank_last4',
+        'bank_name',
+        'account_holder_name',
+        'payout_currency',
+        'custom_vendor_id',
+        'google_id',
+        'signup_method',
+        'cover_image',
+        'last_login',
+        'account_deactivated',
+        'is_active',
+        'account_soft_deleted',
+        'account_soft_deleted_at',
+        'auto_hard_delete_after_days',
         'credits',
     ];
 
     protected $hidden = [
-        'password', 'remember_token', 'otp', 'two_factor_code',
+        'password',
+        'remember_token',
+        'otp',
+        'two_factor_code',
     ];
 
     protected $casts = [
@@ -215,6 +249,4 @@ class Vendor extends Authenticatable
     {
         return $this->bookings()->where('custom_booking_id', $customId)->first();
     }
-
-
 }

@@ -19,7 +19,6 @@ return new class extends Migration {
             $table->string('business_registration')->nullable();
             $table->string('business_license_number')->nullable();
             $table->decimal('rating', 3, 2)->default(0);
-            $table->boolean('is_featured')->default(false);
             $table->enum('business_type', ['partnership', 'llc', 'corporation', 'Service', 'Product', 'Venue'])->nullable();
             $table->string('website')->nullable();
             $table->json('social_links')->nullable();
@@ -27,6 +26,7 @@ return new class extends Migration {
             $table->string('business_email')->nullable();
             $table->string('business_phone')->nullable();
             $table->json('features')->nullable();
+            $table->boolean('is_featured')->default(false);
             $table->enum('profile_verification', ['pending', 'verified', 'approved', 'under_review', 'rejected', 'banned'])->default('verified');
             $table->string('services')->nullable();
             $table->json('faqs')->nullable();

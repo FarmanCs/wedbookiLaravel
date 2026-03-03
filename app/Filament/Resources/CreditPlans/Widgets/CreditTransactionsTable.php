@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\CreditPlans\Widgets;
 
-use App\Models\Admin\CreditTransaction;
+use App\Models\Subscription\CreditsTransaction;
 use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
@@ -18,7 +18,7 @@ class CreditTransactionsTable extends TableWidget
 
     protected function getTableQuery(): Builder
     {
-        return CreditTransaction::query()
+        return CreditsTransaction::query()
             ->with([
                 'business:id,company_name,business_email,business_phone,business_type,profile_verification,rating,street_address,city,country,postal_code,payment_days_advance,payment_days_final,advance_percentage,view_count,social_count,last_login',
                 'business.vendor:id,full_name,email,phone_no,country,city,years_of_experience',
@@ -45,11 +45,12 @@ class CreditTransactionsTable extends TableWidget
                 TextColumn::make('tran_type')
                     ->label('Type')
                     ->badge()
-                    ->icon(fn (string $state) => $state === 'credit'
-                        ? 'heroicon-m-arrow-down-circle'
-                        : 'heroicon-m-arrow-up-circle'
+                    ->icon(
+                        fn(string $state) => $state === 'credit'
+                            ? 'heroicon-m-arrow-down-circle'
+                            : 'heroicon-m-arrow-up-circle'
                     )
-                    ->color(fn (string $state) => match ($state) {
+                    ->color(fn(string $state) => match ($state) {
                         'credit' => 'success',
                         'debit'  => 'danger',
                         default  => 'gray',
@@ -103,7 +104,7 @@ class CreditTransactionsTable extends TableWidget
                     TextEntry::make('tran_type')
                         ->label('Type')
                         ->badge()
-                        ->color(fn ($state) => $state === 'credit' ? 'success' : 'danger'),
+                        ->color(fn($state) => $state === 'credit' ? 'success' : 'danger'),
                     TextEntry::make('amount')->money('USD'),
                     TextEntry::make('no_of_credits')->label('Credits'),
 
@@ -145,16 +146,16 @@ class CreditTransactionsTable extends TableWidget
                 ->schema([
                     TextEntry::make('business.vendor.full_name')
                         ->icon('heroicon-m-user')
-                    ->color('success'),
+                        ->color('success'),
                     TextEntry::make('business.vendor.email')
                         ->icon('heroicon-m-envelope')
                         ->color('success'),
                     TextEntry::make('business.vendor.phone_no')
                         ->icon('heroicon-m-phone')
-                    ->color('success'),
+                        ->color('success'),
 
                     TextEntry::make('business.vendor.country')
-                    ->icon('heroicon-m-phone'),
+                        ->icon('heroicon-m-phone'),
                     TextEntry::make('business.vendor.city'),
                     TextEntry::make('business.vendor.years_of_experience')
                         ->suffix(' years'),
@@ -181,8 +182,8 @@ class CreditTransactionsTable extends TableWidget
                 ->columns(3)
                 ->schema([
                     TextEntry::make('business.street_address')->columnSpanFull(),
-//                    TextEntry::make('business.city'),
-//                    TextEntry::make('business.country'),
+                    //                    TextEntry::make('business.city'),
+                    //                    TextEntry::make('business.country'),
                     TextEntry::make('business.postal_code'),
                 ]),
 

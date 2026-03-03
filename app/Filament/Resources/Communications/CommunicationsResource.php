@@ -9,7 +9,7 @@ use App\Filament\Resources\Communications\Pages\ViewCommunications;
 use App\Filament\Resources\Communications\Schemas\CommunicationsForm;
 use App\Filament\Resources\Communications\Schemas\CommunicationsInfolist;
 use App\Filament\Resources\Communications\Tables\CommunicationsTable;
-use App\Models\Admin\Notification;
+use App\Models\Communication\Notification;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -27,7 +27,7 @@ class CommunicationsResource extends Resource
 
     protected static string|BackedEnum|null $navigationTitle = 'Communications';
 
-    protected static ?int $navigationSort=10;
+    protected static ?int $navigationSort = 10;
     public static function form(Schema $schema): Schema
     {
         return CommunicationsForm::configure($schema);

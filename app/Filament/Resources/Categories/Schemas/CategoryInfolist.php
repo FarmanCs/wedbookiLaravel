@@ -20,7 +20,7 @@ class CategoryInfolist
                     ->schema([
                         ImageEntry::make('image')
                             ->label('')
-                            ->disk('s3')
+                            ->disk('public')
                             ->height(150)
                             ->width(420)
                     ]),

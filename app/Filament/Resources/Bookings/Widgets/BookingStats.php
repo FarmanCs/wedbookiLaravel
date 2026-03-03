@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Bookings\Widgets;
 
-use App\Models\Vendor\Booking;
+use App\Models\Booking\Booking;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -35,8 +35,7 @@ class BookingStats extends StatsOverviewWidget
                 ->icon('heroicon-o-clock'),
 
             Stat::make('Paid Bookings', function () {
-                return   Booking::whereIn('payment_status', ['advancePaid','fullyPaid'])->count();
-
+                return   Booking::whereIn('payment_status', ['advancePaid', 'fullyPaid'])->count();
             })
                 ->description('Total paid bookings')
                 ->color('success')

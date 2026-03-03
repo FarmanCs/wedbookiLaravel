@@ -44,6 +44,7 @@ return new class extends Migration {
             $table->string('google_id')->nullable();
             $table->enum('signup_method', ['email', 'google', 'apple'])->default('email');
             $table->string('cover_image')->nullable();
+            $table->boolean('is_boosted')->default(false);
             $table->timestamp('last_login')->nullable();
             $table->boolean('account_deactivated')->default(false);
             $table->boolean('is_active')->default(false);
@@ -52,8 +53,6 @@ return new class extends Migration {
             $table->integer('auto_hard_delete_after_days')->default(30);
             $table->softDeletes();
             $table->timestamps();
-
-
         });
     }
 

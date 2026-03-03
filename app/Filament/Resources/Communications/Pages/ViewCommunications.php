@@ -39,16 +39,16 @@ class ViewCommunications extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\EditAction::make()
-                ->icon('heroicon-o-pencil-square')
-                ->color('primary'),
+            // Actions\EditAction::make()
+            //     ->icon('heroicon-o-pencil-square')
+            //     ->color('primary'),
 
-            Actions\DeleteAction::make()
-                ->icon('heroicon-o-trash')
-                ->requiresConfirmation()
-                ->modalHeading('Delete Communication')
-                ->modalDescription('Are you sure you want to delete this communication? This action cannot be undone.')
-                ->modalSubmitActionLabel('Yes, delete it'),
+            // Actions\DeleteAction::make()
+            //     ->icon('heroicon-o-trash')
+            //     ->requiresConfirmation()
+            //     ->modalHeading('Delete Communication')
+            //     ->modalDescription('Are you sure you want to delete this communication? This action cannot be undone.')
+            //     ->modalSubmitActionLabel('Yes, delete it'),
 
             Actions\Action::make('duplicate')
                 ->label('Duplicate')
@@ -63,7 +63,7 @@ class ViewCommunications extends ViewRecord
                     $this->redirect(static::$resource::getUrl('edit', ['record' => $newRecord]));
                 })
                 ->requiresConfirmation()
-                ->visible(fn () => $this->record->status === 'sent'),
+                ->visible(fn() => $this->record->status === 'sent'),
 
             Actions\Action::make('send_now')
                 ->label('Send Now')
@@ -73,7 +73,7 @@ class ViewCommunications extends ViewRecord
                     $this->record->update(['status' => 'sent']);
                 })
                 ->requiresConfirmation()
-                ->visible(fn () => in_array($this->record->status, ['draft', 'scheduled'])),
+                ->visible(fn() => in_array($this->record->status, ['draft', 'scheduled'])),
         ];
     }
 

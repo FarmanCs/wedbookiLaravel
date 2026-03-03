@@ -21,7 +21,7 @@ class CreditPlansTable
             ->columns([
                 ImageColumn::make('image')
                     ->label('Image')
-                    ->disk('s3')
+                    ->disk('public')
                     ->visibility('public')
                     ->height(50)
                     ->circular(),

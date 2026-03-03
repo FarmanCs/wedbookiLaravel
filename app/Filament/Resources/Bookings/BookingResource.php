@@ -9,7 +9,7 @@ use App\Filament\Resources\Bookings\Pages\ViewBooking;
 use App\Filament\Resources\Bookings\Schemas\BookingForm;
 use App\Filament\Resources\Bookings\Schemas\BookingInfolist;
 use App\Filament\Resources\Bookings\Tables\BookingsTable;
-use App\Models\Vendor\Booking;
+use App\Models\Booking\Booking;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -26,11 +26,11 @@ class BookingResource extends Resource
 
     protected static ?string $navigationLabel = 'Bookings';
 
-//    protected static ?string $modelLabel = 'Booking';
+    //    protected static ?string $modelLabel = 'Booking';
 
-//    protected static ?string $pluralModelLabel = 'Bookings';
+    //    protected static ?string $pluralModelLabel = 'Bookings';
 
-//    protected static string|null|\UnitEnum $navigationGroup = 'Vendor Management';
+    //    protected static string|null|\UnitEnum $navigationGroup = 'Vendor Management';
 
     protected static ?int $navigationSort = 5;
 

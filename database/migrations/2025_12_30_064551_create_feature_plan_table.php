@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
 
-            $table->unique(['feature_id', 'plan_id']);
+            // $table->unique(['feature_id', 'plan_id']);
         });
     }
 

@@ -10,8 +10,8 @@ return new  class extends Migration {
         Schema::create('feature_package', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('admin_package_id') // Note: table name is admin_packages
-            ->constrained('admin_packages')
+            $table->foreignId('package_id') // Note: table name is admin_packages
+                ->constrained('packages')
                 ->cascadeOnDelete();
 
             $table->foreignId('feature_id')
@@ -19,8 +19,6 @@ return new  class extends Migration {
                 ->cascadeOnDelete();
 
             $table->timestamps();
-
-            $table->unique(['admin_package_id', 'feature_id']);
         });
     }
 

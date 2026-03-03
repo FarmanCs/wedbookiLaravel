@@ -4,16 +4,19 @@ namespace App\Livewire\Vendor\Dashboard;
 
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use App\Models\Vendor\Vendor;
 use App\Models\Business\Business;
 use App\Models\Business\Package;
 use App\Models\Timing\Timing;
+use App\Models\Category\Category;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 #[Layout('components.layouts.vendor.vendor')]
 class Index extends Component
 {
+    use WithFileUploads;
+
     public $vendor;
     public $pageVisitors = 0;
     public $totalBookings = 0;
@@ -25,10 +28,12 @@ class Index extends Component
     public $rating = 0;
     public $ratingCount = 0;
 
-    // Modal states for Quick Actions
+    // Modal states
     public $showAvailabilityModal = false;
     public $showPackageModal = false;
     public $showMessageModal = false;
+    public $showProfileModal = false;
+    public $showBusinessModal = false;
 
     // Form data for modals
     public $selectedBusiness = null;
@@ -49,6 +54,34 @@ class Index extends Component
     public $messageSubject = '';
     public $messageBody = '';
 
+    public $showBoostModal = false;
+    public $boostBusinessId = null;
+    public $boostBusinesses = [];
+
+    // Profile form
+    public $profile = [
+        'full_name' => '',
+        'email' => '',
+        'phone_no' => '',
+        'country_code' => '',
+        'about' => '',
+    ];
+    public $profile_image;
+    public $profile_image_preview;
+
+    // Business form (matches Business model fields)
+    public $businessForm = [
+        'company_name' => '',
+        'category_id' => '',
+        'business_desc' => '',
+        'business_email' => '',
+        'business_phone' => '',
+        'street_address' => '',
+        'city' => '',
+        'country' => '',
+    ];
+    public $categories = [];
+
     // Countdown
     public $upcomingEvents = [];
 
@@ -58,9 +91,47 @@ class Index extends Component
 
         if ($this->vendor) {
             $this->loadBusinesses();
+            $this->loadCategories();
             $this->loadDashboardData();
             $this->loadUpcomingEvents();
         }
+    }
+
+    public function openBoostModal()
+    {
+        $this->loadBusinesses(); // Reload businesses
+        if (empty($this->businesses)) {
+            session()->flash('error', 'Please create a business first before boosting.');
+            return;
+        }
+        // Prepare businesses for dropdown
+        $this->boostBusinesses = $this->businesses; // Already has id and business_name
+        $this->boostBusinessId = $this->businesses[0]['id'] ?? null;
+        $this->showBoostModal = true;
+    }
+
+    public function closeBoostModal()
+    {
+        $this->showBoostModal = false;
+        $this->reset(['boostBusinessId', 'boostBusinesses']);
+    }
+
+    public function confirmBoost()
+    {
+        $this->validate([
+            'boostBusinessId' => 'required|exists:businesses,id',
+        ]);
+
+        $business = Business::where('id', $this->boostBusinessId)
+            ->where('vendor_id', $this->vendor->id)
+            ->firstOrFail();
+
+        // Toggle the is_featured flag
+        $business->update(['is_featured' => !$business->is_featured]);
+
+        $this->closeBoostModal();
+        session()->flash('success', 'Business boost status updated successfully!');
+        $this->dispatch('boost-updated');
     }
 
     public function loadDashboardData()
@@ -109,74 +180,32 @@ class Index extends Component
         }
     }
 
-    //Load businesses with multiple fallback methods
     public function loadBusinesses()
     {
         try {
-            // Method 1: Try using the relationship
-            if ($this->vendor && method_exists($this->vendor, 'businesses')) {
-                $businesses = $this->vendor->businesses()
-                    ->select('id', 'business_name')
-                    ->get();
-
-                if ($businesses && $businesses->count() > 0) {
-                    $this->mapBusinesses($businesses);
-                    return;
-                }
-            }
-
-            // Method 2: Direct database query
-            $businesses = Business::where('vendor_id', $this->vendor->id)
-                ->select('id', 'business_name')
-                ->get();
-            dd("business: ", $businesses);
-
-            if ($businesses && $businesses->count() > 0) {
-                $this->mapBusinesses($businesses);
-                return;
-            }
-
-            // Method 3: Try with raw query
-            $businessesArray = DB::table('businesses')
-                ->where('vendor_id', $this->vendor->id)
-                ->select('id', 'business_name')
-                ->get();
-
-            if ($businessesArray && $businessesArray->count() > 0) {
-                $this->businesses = $businessesArray->map(fn($b) => [
+            $this->businesses = $this->vendor->businesses()
+                ->select('id', 'company_name')
+                ->get()
+                ->map(fn($b) => [
                     'id' => $b->id,
-                    'business_name' => $b->business_name,
-                ])->toArray();
+                    'business_name' => $b->company_name // Map to display name
+                ])
+                ->toArray();
 
-                if (!empty($this->businesses)) {
-                    $this->selectedBusiness = $this->businesses[0]['id'];
-                }
-                return;
+            if (count($this->businesses) > 0) {
+                $this->selectedBusiness = $this->businesses[0]['id'];
             }
-
-            // If we reach here, no businesses found
-            $this->businesses = [];
-            $this->selectedBusiness = null;
         } catch (\Exception $e) {
-            \Log::error('Error loading businesses: ' . $e->getMessage() . ' | Trace: ' . $e->getTraceAsString());
+            \Log::error('loadBusinesses error: ' . $e->getMessage());
             $this->businesses = [];
-            $this->selectedBusiness = null;
         }
     }
 
-    // Helper method to map businesses
-    private function mapBusinesses($businesses)
+    public function loadCategories()
     {
-        $this->businesses = $businesses->map(fn($business) => [
-            'id' => $business->id,
-            'business_name' => $business->business_name,
-        ])->toArray();
-
-        DD("busniess:", $this->businesses);
-        if (!empty($this->businesses)) {
-            $this->selectedBusiness = $this->businesses[0]['id'];
-        }
+        $this->categories = Category::pluck('type', 'id')->toArray();
     }
+
     public function loadUpcomingEvents()
     {
         try {
@@ -200,37 +229,129 @@ class Index extends Component
         }
     }
 
-    // Open Availability Modal - with real-time business checking
-
-    public function openAvailabilityModal()
+    // ==================== PROFILE ====================
+    public function openProfileModal()
     {
-        // Fresh reload of businesses
-        $this->loadBusinesses();
+        $this->profile = [
+            'full_name' => $this->vendor->full_name,
+            'email' => $this->vendor->email,
+            'phone_no' => $this->vendor->phone_no,
+            'country_code' => $this->vendor->country_code,
+            'about' => $this->vendor->about,
+        ];
+        $this->showProfileModal = true;
+    }
 
-        // Double-check if we really have no businesses
-        if (empty($this->businesses)) {
-            // Try one more time with a direct count
-            $count = Business::where('vendor_id', $this->vendor->id)->count();
+    public function closeProfileModal()
+    {
+        $this->showProfileModal = false;
+        $this->reset(['profile', 'profile_image', 'profile_image_preview']);
+    }
 
-            if ($count === 0) {
-                session()->flash('error', 'Please create a business first before updating availability.');
-                return;
-            } else {
-                // Businesses exist but mapping failed, try again
-                $this->loadBusinesses();
-            }
+    public function updatedProfileImage()
+    {
+        $this->validate([
+            'profile_image' => 'image|max:2048', // 2MB max
+        ]);
+        $this->profile_image_preview = $this->profile_image->temporaryUrl();
+    }
+
+    public function saveProfile()
+    {
+        $this->validate([
+            'profile.full_name' => 'required|string|max:255',
+            'profile.email' => 'required|email|unique:vendors,email,' . $this->vendor->id,
+            'profile.phone_no' => 'nullable|string|max:20',
+            'profile.country_code' => 'nullable|string|max:10',
+            'profile.about' => 'nullable|string',
+            'profile_image' => 'nullable|image|max:2048',
+        ]);
+
+        $data = $this->profile;
+        if ($this->profile_image) {
+            $path = $this->profile_image->store('vendor-profiles', 'public');
+            $data['profile_image'] = $path;
         }
 
-        // If still empty, show error
-        // dd($this->businesses);
-        // if (empty($this->businesses)) {
-        //     session()->flash('error', 'Unable to load your businesses. Please try again.');
-        //     return;
-        // }
+        $this->vendor->update($data);
+        $this->closeProfileModal();
+        session()->flash('success', 'Profile updated successfully!');
+    }
 
+    // ==================== BUSINESS ====================
+    public function openBusinessModal($businessId = null)
+    {
+        $this->loadCategories();
+        if ($businessId) {
+            $business = Business::findOrFail($businessId);
+            $this->businessForm = [
+                'company_name' => $business->company_name,
+                'category_id' => $business->category_id,
+                'business_desc' => $business->business_desc,
+                'business_email' => $business->business_email,
+                'business_phone' => $business->business_phone,
+                'street_address' => $business->street_address,
+                'city' => $business->city,
+                'country' => $business->country,
+            ];
+        } else {
+            $this->reset('businessForm');
+        }
+        $this->showBusinessModal = true;
+    }
+
+    public function closeBusinessModal()
+    {
+        $this->showBusinessModal = false;
+        $this->reset('businessForm');
+    }
+
+    public function saveBusiness()
+    {
+        $this->validate([
+            'businessForm.company_name' => 'required|string|max:255',
+            'businessForm.category_id' => 'required|exists:categories,id',
+            'businessForm.business_desc' => 'nullable|string',
+            'businessForm.business_email' => 'nullable|email',
+            'businessForm.business_phone' => 'nullable|string',
+            'businessForm.street_address' => 'nullable|string',
+            'businessForm.city' => 'nullable|string',
+            'businessForm.country' => 'nullable|string',
+        ]);
+
+        $businessData = array_merge($this->businessForm, ['vendor_id' => $this->vendor->id]);
+
+        if (isset($businessData['id'])) {
+            $business = Business::find($businessData['id']);
+            $business->update($businessData);
+            $message = "Business '{$business->company_name}' updated successfully!";
+        } else {
+            $business = Business::create($businessData);
+            $message = "Business '{$business->company_name}' created successfully!";
+        }
+
+        $this->closeBusinessModal();
+        $this->loadBusinesses(); // refresh list
+        session()->flash('success', $message);
+    }
+
+    // ==================== BOOST PROFILE ====================
+    public function toggleBoost()
+    {
+        // Add 'is_boosted' column to vendors table first
+        $this->vendor->update(['is_boosted' => !$this->vendor->is_boosted]);
+        session()->flash('success', 'Profile boost ' . ($this->vendor->is_boosted ? 'enabled' : 'disabled') . '!');
+    }
+
+    // ==================== AVAILABILITY ====================
+    public function openAvailabilityModal()
+    {
+        $this->loadBusinesses();
+        if (empty($this->businesses)) {
+            session()->flash('error', 'Please create a business first.');
+            return;
+        }
         $this->showAvailabilityModal = true;
-
-        // Ensure selectedBusiness is set
         if (empty($this->selectedBusiness) && !empty($this->businesses)) {
             $this->selectedBusiness = $this->businesses[0]['id'];
         }
@@ -252,72 +373,38 @@ class Index extends Component
 
     public function saveAvailability()
     {
-        try {
-            if (empty($this->selectedBusiness)) {
-                session()->flash('error', 'Please select a business.');
-                return;
-            }
+        $this->validate([
+            'selectedBusiness' => 'required|exists:businesses,id',
+            'slotDuration' => 'required|integer|min:15|max:480',
+        ]);
 
-            // Verify business exists and belongs to vendor
-            $business = Business::where('id', $this->selectedBusiness)
-                ->where('vendor_id', $this->vendor->id)
-                ->first();
+        $business = Business::where('id', $this->selectedBusiness)
+            ->where('vendor_id', $this->vendor->id)
+            ->firstOrFail();
 
-            if (!$business) {
-                session()->flash('error', 'Invalid business selected.');
-                return;
-            }
+        Timing::updateOrCreate(
+            ['business_id' => $business->id],
+            [
+                'slot_duration' => $this->slotDuration,
+                'unavailable_dates' => $this->unavailableDates ?? [],
+                'working_hours' => $this->workingHours ?? [],
+            ]
+        );
 
-            Timing::updateOrCreate(
-                ['business_id' => $this->selectedBusiness],
-                [
-                    'slot_duration' => $this->slotDuration ?? 60,
-                    'unavailable_dates' => $this->unavailableDates ?? [],
-                    'working_hours' => $this->workingHours ?? [],
-                ]
-            );
-
-            $this->closeAvailabilityModal();
-            session()->flash('success', 'Availability updated successfully!');
-            $this->dispatch('availability-updated');
-        } catch (\Exception $e) {
-            \Log::error('Error saving availability: ' . $e->getMessage());
-            session()->flash('error', 'Failed to update availability. Please try again.');
-        }
+        $this->closeAvailabilityModal();
+        session()->flash('success', 'Availability updated successfully!');
+        $this->dispatch('availability-updated');
     }
 
-    /**
-     * Open Package Modal - with real-time business checking
-     */
+    // ==================== PACKAGE ====================
     public function openPackageModal()
     {
-        // Fresh reload of businesses
         $this->loadBusinesses();
-
-        // Double-check if we really have no businesses
         if (empty($this->businesses)) {
-            // Try one more time with a direct count
-            $count = Business::where('vendor_id', $this->vendor->id)->count();
-
-            if ($count === 0) {
-                session()->flash('error', 'Please create a business first before creating packages.');
-                return;
-            } else {
-                // Businesses exist but mapping failed, try again
-                $this->loadBusinesses();
-            }
+            session()->flash('error', 'Please create a business first.');
+            return;
         }
-
-        // dd($this->businesses);
-        // If still empty, show error
-        // if (empty($this->businesses)) {
-        //     session()->flash('error', 'Unable to load your businesses. Please try again.');
-        //     return;
-        // }
-
         $this->showPackageModal = true;
-
-        // Ensure selectedBusiness is set
         if (empty($this->selectedBusiness) && !empty($this->businesses)) {
             $this->selectedBusiness = $this->businesses[0]['id'];
         }
@@ -342,52 +429,38 @@ class Index extends Component
     public function savePackage()
     {
         $this->validate([
+            'selectedBusiness' => 'required|exists:businesses,id',
             'packageName' => 'required|string|max:255',
             'packagePrice' => 'required|numeric|min:0',
             'packageDescription' => 'required|string',
         ]);
 
-        try {
-            if (empty($this->selectedBusiness)) {
-                session()->flash('error', 'Please select a business.');
-                return;
-            }
+        $business = Business::where('id', $this->selectedBusiness)
+            ->where('vendor_id', $this->vendor->id)
+            ->firstOrFail();
 
-            // Verify business exists and belongs to vendor
-            $business = Business::where('id', $this->selectedBusiness)
-                ->where('vendor_id', $this->vendor->id)
-                ->first();
+        $features = $this->packageFeatures
+            ? array_map('trim', explode(',', $this->packageFeatures))
+            : [];
 
-            if (!$business) {
-                session()->flash('error', 'Invalid business selected.');
-                return;
-            }
+        $package = Package::create([
+            'business_id' => $business->id,
+            'name' => $this->packageName,
+            'price' => $this->packagePrice,
+            'discount' => $this->packageDiscount ?? 0,
+            'description' => $this->packageDescription,
+            'features' => $features,
+            'is_popular' => $this->isPopular,
+        ]);
 
-            // Parse features
-            $features = $this->packageFeatures
-                ? array_map('trim', explode(',', $this->packageFeatures))
-                : [];
-
-            // Create package
-            Package::create([
-                'business_id' => $this->selectedBusiness,
-                'name' => $this->packageName,
-                'price' => $this->packagePrice,
-                'discount' => $this->packageDiscount ?? 0,
-                'description' => $this->packageDescription,
-                'features' => $features,
-                'is_popular' => $this->isPopular,
-            ]);
-
-            $this->closePackageModal();
-            session()->flash('success', 'Package created successfully!');
-            $this->dispatch('package-created');
-        } catch (\Exception $e) {
-            \Log::error('Error saving package: ' . $e->getMessage());
-            session()->flash('error', 'Failed to create package. Please try again.');
-        }
+        $this->closePackageModal();
+        session()->flash('success', 'Profile updated successfully!');
+        session()->flash('success', "Package '{$package->name}' created successfully for {$business->company_name}!");
+        $this->dispatch('package-created');
     }
+    // public function showCredist() {}
 
+    // ==================== MESSAGE ====================
     public function openMessageModal()
     {
         $this->showMessageModal = true;
@@ -408,6 +481,7 @@ class Index extends Component
         ]);
 
         try {
+            // Implement actual message sending logic here (e.g., create chat message)
             $this->closeMessageModal();
             session()->flash('success', 'Message sent successfully!');
         } catch (\Exception $e) {
@@ -431,6 +505,7 @@ class Index extends Component
             'ratingCount' => $this->ratingCount,
             'upcomingEvents' => $this->upcomingEvents,
             'businesses' => $this->businesses,
+            'categories' => $this->categories,
         ]);
     }
 }

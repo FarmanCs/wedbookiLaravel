@@ -24,11 +24,56 @@
                                 </p>
                                 
                                 <div class="flex gap-4 flex-wrap">
-                                    <button class="bg-white text-green-600 px-8 py-3 rounded-xl font-semibold hover:bg-green-50 transition-all hover:shadow-lg flex items-center gap-2 group">
-                                        <flux:icon.rocket-launch class="w-5 h-5 group-hover:scale-110 transition-transform" />
-                                        Boost Profile
-                                    </button>
-                                    <button class="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white hover:bg-opacity-10 transition-all flex items-center gap-2 group">
+                                   <!-- Boost Business Modal -->
+@if($showBoostModal)
+    <div class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-up">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-amber-500 to-orange-600 dark:from-amber-700 dark:to-orange-800 px-6 py-6 flex items-center justify-between border-b border-amber-600/50 dark:border-amber-900/50 shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                        <flux:icon.rocket-launch class="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold text-white">Boost Your Business</h2>
+                    </div>
+                </div>
+                <button wire:click="closeBoostModal" class="text-white hover:bg-white/20 p-2 rounded-lg transition-all">
+                    <flux:icon.x-mark class="w-6 h-6" />
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Select Business to Boost</label>
+                    <select wire:model="boostBusinessId" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">Choose a business</option>
+                        @foreach($boostBusinesses as $business)
+                            <option value="{{ $business['id'] }}">{{ $business['business_name'] }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg p-4">
+                    <p class="text-sm text-amber-800 dark:text-amber-200 flex items-center gap-2">
+                        <flux:icon.information-circle class="w-5 h-5 flex-shrink-0" />
+                        Boosting your business makes it appear more prominently in search results and increases visibility.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3 shadow-lg">
+                <button wire:click="closeBoostModal" class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600">Cancel</button>
+                <button wire:click="confirmBoost" class="px-6 py-2.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-md flex items-center gap-2">
+                    <flux:icon.check class="w-5 h-5" /> Confirm Boost
+                </button>
+            </div>
+        </div>
+    </div>
+@endif
+                                    <button wire:click="openProfileModal" class="border-2 border-white text-white px-8 py-3 rounded-xl font-semibold hover:bg-white hover:bg-opacity-10 transition-all flex items-center gap-2 group">
                                         <flux:icon.pencil-square class="w-5 h-5 group-hover:scale-110 transition-transform" />
                                         Edit Profile
                                     </button>
@@ -61,7 +106,7 @@
                                             </div>
                                             <div class="flex items-center gap-2 text-green-100 text-xs">
                                                 <flux:icon.calendar class="w-3.5 h-3.5" />
-                                                {{ $event['event_date']->format('d M Y') }}
+                                                {{ \Carbon\Carbon::parse($event['event_date'])->format('d M Y') }}
                                             </div>
                                         </div>
                                     @endforeach
@@ -107,7 +152,7 @@
             <div class="bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-sm border border-gray-200 dark:border-zinc-800 hover:shadow-md hover:border-amber-500 transition-all duration-300 cursor-pointer group">
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <flux:icon.calendar class="w-5 h-5 text-amber-500" />
+                        <x-heroicon-o-currency-dollar class="w-5 h-5 text-amber-500"/>
                     </div>
                 </div>
                 <div class="space-y-1">
@@ -271,11 +316,20 @@
                     </h2>
 
                     <div class="space-y-3">
+                        <!-- Manage Businesses -->
+                        <button wire:click="openBusinessModal" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all group border border-gray-200 dark:border-zinc-700 hover:border-indigo-300 dark:hover:border-indigo-700">
+                            <div class="w-10 h-10 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
+                                <flux:icon.building-office class="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                            </div>
+                            <div class="text-left flex-1">
+                                <h4 class="font-semibold text-gray-900 dark:text-white text-sm">Manage Businesses</h4>
+                                <p class="text-xs text-gray-600 dark:text-gray-400">Add or edit your businesses</p>
+                            </div>
+                            <flux:icon.arrow-right class="w-4 h-4 text-gray-400 dark:text-gray-500 group-hover:translate-x-1 transition-transform" />
+                        </button>
+
                         <!-- Update Availability -->
-                        <button 
-                            wire:click="openAvailabilityModal"
-                            class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group border border-gray-200 dark:border-zinc-700 hover:border-green-300 dark:hover:border-green-700"
-                        >
+                        <button wire:click="openAvailabilityModal" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-green-50 dark:hover:bg-green-900/20 transition-all group border border-gray-200 dark:border-zinc-700 hover:border-green-300 dark:hover:border-green-700">
                             <div class="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
                                 <flux:icon.calendar-days class="w-5 h-5 text-green-600 dark:text-green-400" />
                             </div>
@@ -287,10 +341,7 @@
                         </button>
 
                         <!-- Create Package -->
-                        <button 
-                            wire:click="openPackageModal"
-                            class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group border border-gray-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700"
-                        >
+                        <button wire:click="openPackageModal" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all group border border-gray-200 dark:border-zinc-700 hover:border-blue-300 dark:hover:border-blue-700">
                             <div class="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
                                 <flux:icon.cube class="w-5 h-5 text-blue-600 dark:text-blue-400" />
                             </div>
@@ -302,10 +353,7 @@
                         </button>
 
                         <!-- Message Clients -->
-                        <button 
-                            wire:click="openMessageModal"
-                            class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group border border-gray-200 dark:border-zinc-700 hover:border-purple-300 dark:hover:border-purple-700"
-                        >
+                        <button wire:click="openMessageModal" class="w-full flex items-center gap-4 p-4 rounded-xl bg-gray-50 dark:bg-zinc-800/50 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-all group border border-gray-200 dark:border-zinc-700 hover:border-purple-300 dark:hover:border-purple-700">
                             <div class="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform flex-shrink-0">
                                 <flux:icon.chat-bubble-left class="w-5 h-5 text-purple-600 dark:text-purple-400" />
                             </div>
@@ -360,12 +408,13 @@
 
     </div>
 
+    <!-- ========== MODALS ========== -->
+
     <!-- Update Availability Modal -->
     @if($showAvailabilityModal)
         <div class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
             <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-up">
-                
-                <!-- Modal Header -->
+                <!-- Header -->
                 <div class="bg-gradient-to-r from-green-500 to-green-600 dark:from-green-700 dark:to-green-800 px-6 py-6 flex items-center justify-between border-b border-green-600/50 dark:border-green-900/50 shadow-lg">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
@@ -375,44 +424,26 @@
                             <h2 class="text-lg font-bold text-white">Update Availability</h2>
                         </div>
                     </div>
-                    <button 
-                        wire:click="closeAvailabilityModal"
-                        class="text-white hover:bg-white/20 p-2 rounded-lg transition-all"
-                    >
+                    <button wire:click="closeAvailabilityModal" class="text-white hover:bg-white/20 p-2 rounded-lg transition-all">
                         <flux:icon.x-mark class="w-6 h-6" />
                     </button>
                 </div>
 
-                <!-- Modal Body -->
+                <!-- Body -->
                 <div class="p-6 space-y-4">
-                    <!-- Business Select -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Select Business</label>
-                        <select 
-                            wire:model="selectedBusiness"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-                        >
+                        <select wire:model="selectedBusiness" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500">
                             <option value="">Choose a business</option>
                             @foreach($businesses as $business)
                                 <option value="{{ $business['id'] }}">{{ $business['business_name'] }}</option>
                             @endforeach
                         </select>
                     </div>
-
-                    <!-- Slot Duration -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Slot Duration (minutes)</label>
-                        <input 
-                            type="number" 
-                            wire:model="slotDuration"
-                            min="15"
-                            max="480"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500 transition-all"
-                            placeholder="60"
-                        />
+                        <input type="number" wire:model="slotDuration" min="15" max="480" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="60" />
                     </div>
-
-                    <!-- Info Message -->
                     <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/50 rounded-lg p-4">
                         <p class="text-sm text-green-800 dark:text-green-200 flex items-center gap-2">
                             <flux:icon.information-circle class="w-5 h-5 flex-shrink-0" />
@@ -421,20 +452,11 @@
                     </div>
                 </div>
 
-                <!-- Modal Footer -->
+                <!-- Footer -->
                 <div class="bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3 shadow-lg">
-                    <button 
-                        wire:click="closeAvailabilityModal"
-                        class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600 transition-all"
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        wire:click="saveAvailability"
-                        class="px-6 py-2.5 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold transition-all shadow-md flex items-center gap-2"
-                    >
-                        <flux:icon.check class="w-5 h-5" />
-                        Save
+                    <button wire:click="closeAvailabilityModal" class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600">Cancel</button>
+                    <button wire:click="saveAvailability" class="px-6 py-2.5 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold shadow-md flex items-center gap-2">
+                        <flux:icon.check class="w-5 h-5" /> Save
                     </button>
                 </div>
             </div>
@@ -445,8 +467,7 @@
     @if($showPackageModal)
         <div class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
             <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 max-h-[90vh] overflow-y-auto animate-scale-up">
-                
-                <!-- Modal Header -->
+                <!-- Header -->
                 <div class="sticky top-0 bg-gradient-to-r from-blue-500 to-blue-600 dark:from-blue-700 dark:to-blue-800 px-6 py-6 flex items-center justify-between border-b border-blue-600/50 dark:border-blue-900/50 shadow-lg">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
@@ -456,117 +477,53 @@
                             <h2 class="text-lg font-bold text-white">Create Package</h2>
                         </div>
                     </div>
-                    <button 
-                        wire:click="closePackageModal"
-                        class="text-white hover:bg-white/20 p-2 rounded-lg transition-all"
-                    >
+                    <button wire:click="closePackageModal" class="text-white hover:bg-white/20 p-2 rounded-lg transition-all">
                         <flux:icon.x-mark class="w-6 h-6" />
                     </button>
                 </div>
 
-                <!-- Modal Body -->
+                <!-- Body -->
                 <div class="p-6 space-y-4">
-                    <!-- Business Select -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Select Business</label>
-                        <select 
-                            wire:model="selectedBusiness"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                        >
+                        <select wire:model="selectedBusiness" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">Choose a business</option>
                             @foreach($businesses as $business)
                                 <option value="{{ $business['id'] }}">{{ $business['business_name'] }}</option>
                             @endforeach
                         </select>
                     </div>
-
-                    <!-- Package Name -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Package Name</label>
-                        <input 
-                            type="text" 
-                            wire:model="packageName"
-                            placeholder="e.g., Gold Package"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                        />
+                        <input type="text" wire:model="packageName" placeholder="e.g., Gold Package" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
-
-                    <!-- Package Price -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Price (Rs)</label>
-                        <input 
-                            type="number" 
-                            wire:model="packagePrice"
-                            placeholder="5000"
-                            min="0"
-                            step="100"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                        />
+                        <input type="number" wire:model="packagePrice" placeholder="5000" min="0" step="100" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
-
-                    <!-- Package Discount -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Discount (Rs) - Optional</label>
-                        <input 
-                            type="number" 
-                            wire:model="packageDiscount"
-                            placeholder="0"
-                            min="0"
-                            step="100"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                        />
+                        <input type="number" wire:model="packageDiscount" placeholder="0" min="0" step="100" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500" />
                     </div>
-
-                    <!-- Package Description -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Description</label>
-                        <textarea 
-                            wire:model="packageDescription"
-                            placeholder="Describe your package..."
-                            rows="3"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
-                        ></textarea>
+                        <textarea wire:model="packageDescription" placeholder="Describe your package..." rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
                     </div>
-
-                    <!-- Package Features -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Features (comma separated)</label>
-                        <textarea 
-                            wire:model="packageFeatures"
-                            placeholder="Feature 1, Feature 2, Feature 3"
-                            rows="2"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-none"
-                        ></textarea>
+                        <textarea wire:model="packageFeatures" placeholder="Feature 1, Feature 2, Feature 3" rows="2" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"></textarea>
                     </div>
-
-                    <!-- Popular Checkbox -->
                     <div class="flex items-center gap-3">
-                        <input 
-                            type="checkbox" 
-                            wire:model="isPopular"
-                            id="isPopular"
-                            class="w-5 h-5 rounded-lg border-gray-300 dark:border-zinc-700 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
-                        />
-                        <label for="isPopular" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
-                            Mark as Popular Package
-                        </label>
+                        <input type="checkbox" wire:model="isPopular" id="isPopular" class="w-5 h-5 rounded-lg border-gray-300 dark:border-zinc-700 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer" />
+                        <label for="isPopular" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">Mark as Popular Package</label>
                     </div>
                 </div>
 
-                <!-- Modal Footer -->
+                <!-- Footer -->
                 <div class="sticky bottom-0 bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3 shadow-lg">
-                    <button 
-                        wire:click="closePackageModal"
-                        class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600 transition-all"
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        wire:click="savePackage"
-                        class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition-all shadow-md flex items-center gap-2"
-                    >
-                        <flux:icon.check class="w-5 h-5" />
-                        Create
+                    <button wire:click="closePackageModal" class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600">Cancel</button>
+                    <button wire:click="savePackage" class="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md flex items-center gap-2">
+                        <flux:icon.check class="w-5 h-5" /> Create
                     </button>
                 </div>
             </div>
@@ -577,8 +534,7 @@
     @if($showMessageModal)
         <div class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
             <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 animate-scale-up">
-                
-                <!-- Modal Header -->
+                <!-- Header -->
                 <div class="bg-gradient-to-r from-purple-500 to-purple-600 dark:from-purple-700 dark:to-purple-800 px-6 py-6 flex items-center justify-between border-b border-purple-600/50 dark:border-purple-900/50 shadow-lg">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
@@ -588,39 +544,21 @@
                             <h2 class="text-lg font-bold text-white">Message Clients</h2>
                         </div>
                     </div>
-                    <button 
-                        wire:click="closeMessageModal"
-                        class="text-white hover:bg-white/20 p-2 rounded-lg transition-all"
-                    >
+                    <button wire:click="closeMessageModal" class="text-white hover:bg-white/20 p-2 rounded-lg transition-all">
                         <flux:icon.x-mark class="w-6 h-6" />
                     </button>
                 </div>
 
-                <!-- Modal Body -->
+                <!-- Body -->
                 <div class="p-6 space-y-4">
-                    <!-- Message Subject -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Subject</label>
-                        <input 
-                            type="text" 
-                            wire:model="messageSubject"
-                            placeholder="Message subject..."
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-                        />
+                        <input type="text" wire:model="messageSubject" placeholder="Message subject..." class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500" />
                     </div>
-
-                    <!-- Message Body -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Message</label>
-                        <textarea 
-                            wire:model="messageBody"
-                            placeholder="Your message here..."
-                            rows="5"
-                            class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
-                        ></textarea>
+                        <textarea wire:model="messageBody" placeholder="Your message here..." rows="5" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"></textarea>
                     </div>
-
-                    <!-- Info Message -->
                     <div class="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/50 rounded-lg p-4">
                         <p class="text-sm text-purple-800 dark:text-purple-200 flex items-center gap-2">
                             <flux:icon.information-circle class="w-5 h-5 flex-shrink-0" />
@@ -629,25 +567,144 @@
                     </div>
                 </div>
 
-                <!-- Modal Footer -->
+                <!-- Footer -->
                 <div class="bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3 shadow-lg">
-                    <button 
-                        wire:click="closeMessageModal"
-                        class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600 transition-all"
-                    >
-                        Cancel
-                    </button>
-                    <button 
-                        wire:click="sendMessage"
-                        class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold transition-all shadow-md flex items-center gap-2"
-                    >
-                        <flux:icon.check class="w-5 h-5" />
-                        Send
+                    <button wire:click="closeMessageModal" class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600">Cancel</button>
+                    <button wire:click="sendMessage" class="px-6 py-2.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-semibold shadow-md flex items-center gap-2">
+                        <flux:icon.check class="w-5 h-5" /> Send
                     </button>
                 </div>
             </div>
         </div>
     @endif
+
+    <!-- Edit Profile Modal -->
+    @if($showProfileModal)
+        <div class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 max-h-[90vh] overflow-y-auto animate-scale-up">
+                <!-- Header -->
+                <div class="sticky top-0 bg-gradient-to-r from-indigo-500 to-indigo-600 dark:from-indigo-700 dark:to-indigo-800 px-6 py-6 flex items-center justify-between border-b border-indigo-600/50 dark:border-indigo-900/50 shadow-lg">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                            <flux:icon.user-circle class="w-6 h-6 text-white" />
+                        </div>
+                        <h2 class="text-lg font-bold text-white">Edit Profile</h2>
+                    </div>
+                    <button wire:click="closeProfileModal" class="text-white hover:bg-white/20 p-2 rounded-lg transition-all">
+                        <flux:icon.x-mark class="w-6 h-6" />
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                        <input type="text" wire:model="profile.full_name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Email</label>
+                        <input type="email" wire:model="profile.email" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Phone</label>
+                        <input type="text" wire:model="profile.phone_no" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Country Code</label>
+                        <input type="text" wire:model="profile.country_code" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">About</label>
+                        <textarea wire:model="profile.about" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Profile Image</label>
+                        <input type="file" wire:model="profile_image" class="w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                        @if($profile_image_preview)
+                            <img src="{{ $profile_image_preview }}" class="mt-2 w-20 h-20 rounded-full object-cover">
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="sticky bottom-0 bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3 shadow-lg">
+                    <button wire:click="closeProfileModal" class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600">Cancel</button>
+                    <button wire:click="saveProfile" class="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md flex items-center gap-2">
+                        <flux:icon.check class="w-5 h-5" /> Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- Manage Business Modal -->
+@if($showBusinessModal)
+    <div class="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fade-in">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-gray-200 dark:border-zinc-800 max-h-[90vh] overflow-y-auto animate-scale-up">
+            <!-- Header -->
+            <div class="sticky top-0 bg-gradient-to-r from-indigo-500 to-indigo-600 dark:from-indigo-700 dark:to-indigo-800 px-6 py-6 flex items-center justify-between border-b border-indigo-600/50 dark:border-indigo-900/50 shadow-lg">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                        <flux:icon.building-office class="w-6 h-6 text-white" />
+                    </div>
+                    <h2 class="text-lg font-bold text-white">{{ isset($businessForm['id']) ? 'Edit' : 'Add' }} Business</h2>
+                </div>
+                <button wire:click="closeBusinessModal" class="text-white hover:bg-white/20 p-2 rounded-lg transition-all">
+                    <flux:icon.x-mark class="w-6 h-6" />
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Business Name</label>
+                    <input type="text" wire:model="businessForm.company_name" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g., Grand Marquee" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Category</label>
+                    <select wire:model="businessForm.category_id" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Select Category</option>
+                        @foreach($categories as $id => $name)
+                            <option value="{{ $id }}">{{ $name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                    <textarea wire:model="businessForm.business_desc" rows="3" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none" placeholder="Describe your business..."></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Business Email</label>
+                    <input type="email" wire:model="businessForm.business_email" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="contact@example.com" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Business Phone</label>
+                    <input type="text" wire:model="businessForm.business_phone" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="+92 300 1234567" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Street Address</label>
+                    <input type="text" wire:model="businessForm.street_address" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="123 Main St" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">City</label>
+                    <input type="text" wire:model="businessForm.city" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Lahore" />
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Country</label>
+                    <input type="text" wire:model="businessForm.country" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Pakistan" />
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="sticky bottom-0 bg-gray-50 dark:bg-zinc-800/50 border-t border-gray-200 dark:border-zinc-800 px-6 py-4 flex items-center justify-end gap-3 shadow-lg">
+                <button wire:click="closeBusinessModal" class="px-6 py-2.5 rounded-lg bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white font-semibold hover:bg-gray-300 dark:hover:bg-zinc-600">Cancel</button>
+                <button wire:click="saveBusiness" class="px-6 py-2.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-md flex items-center gap-2">
+                    <flux:icon.check class="w-5 h-5" /> {{ isset($businessForm['id']) ? 'Update' : 'Create' }}
+                </button>
+            </div>
+        </div>
+    </div>
+@endif  
 
     <!-- CSS for animations -->
     <style>

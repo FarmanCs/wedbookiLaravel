@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Subscriptions\Widgets;
 
 use App\Models\Admin\AdminPackage;
+use App\Models\Subscription\Plan;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
 use Filament\Tables\Columns\Layout\Stack;
@@ -21,7 +22,7 @@ class SubscriptionPackagesWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->query(AdminPackage::query())
+            ->query(Plan::query())
             ->contentGrid([
                 'md' => 3,
                 'xl' => 3,
@@ -49,17 +50,17 @@ class SubscriptionPackagesWidget extends TableWidget
                         TextColumn::make('silver_monthly_price')
                             ->badge()
                             ->color('gray')
-                            ->formatStateUsing(fn ($state) => 'Silver £' . number_format($state)),
+                            ->formatStateUsing(fn($state) => 'Silver £' . number_format($state)),
 
                         TextColumn::make('gold_monthly_price')
                             ->badge()
                             ->color('warning')
-                            ->formatStateUsing(fn ($state) => 'Gold £' . number_format($state)),
+                            ->formatStateUsing(fn($state) => 'Gold £' . number_format($state)),
 
                         TextColumn::make('platinum_monthly_price')
                             ->badge()
                             ->color('success')
-                            ->formatStateUsing(fn ($state) => 'Platinum £' . number_format($state)),
+                            ->formatStateUsing(fn($state) => 'Platinum £' . number_format($state)),
                     ]),
 
                     // STATUS

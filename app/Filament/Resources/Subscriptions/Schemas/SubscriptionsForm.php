@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\Subscriptions\Schemas;
 
-use App\Models\Admin\Feature;
+use App\Models\Feature\Feature;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;

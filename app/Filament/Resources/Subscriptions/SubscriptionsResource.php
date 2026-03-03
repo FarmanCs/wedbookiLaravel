@@ -6,11 +6,11 @@ use App\Filament\Resources\Subscriptions\Pages\CreateSubscriptions;
 use App\Filament\Resources\Subscriptions\Pages\EditSubscriptions;
 use App\Filament\Resources\Subscriptions\Pages\ListSubscriptions;
 use App\Filament\Resources\Subscriptions\Pages\ViewSubscriptions;
-use App\Filament\Resources\Subscriptions\Schemas\SubscriptionsEditForm;
 use App\Filament\Resources\Subscriptions\Schemas\SubscriptionsForm;
 use App\Filament\Resources\Subscriptions\Schemas\SubscriptionsInfolist;
 use App\Filament\Resources\Subscriptions\Tables\SubscriptionsTable;
 use App\Models\Admin\AdminPackage;
+use App\Models\Subscription\Plan;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,11 +21,11 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class SubscriptionsResource extends Resource
 {
-    protected static ?string $model = AdminPackage::class;
+    protected static ?string $model = Plan::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
-    protected static ?string $navigationLabel="Subscriptions";
+    protected static ?string $navigationLabel = "Subscriptions";
 
 
     protected static ?int $navigationSort = 5;
@@ -39,32 +39,32 @@ class SubscriptionsResource extends Resource
 
 
     //working the same way to handle the thing in the main resurces file  like this
-//    public static function form(Schema $schema): Schema
-//    {
-//        // Check if we're in edit mode by looking at the current Livewire component
-//        $livewire = $schema->getLivewire();
-//
-//        // If the component has a record property and it's not null, we're editing
-//        if ($livewire && property_exists($livewire, 'record') && $livewire->record) {
-//            return $schema->schema(SubscriptionsEditForm::getSchema());
-//        }
-//
-//        // Use create form schema (creates 3 packages)
-//        return SubscriptionsForm::configure($schema);
-//    }
+    //    public static function form(Schema $schema): Schema
+    //    {
+    //        // Check if we're in edit mode by looking at the current Livewire component
+    //        $livewire = $schema->getLivewire();
+    //
+    //        // If the component has a record property and it's not null, we're editing
+    //        if ($livewire && property_exists($livewire, 'record') && $livewire->record) {
+    //            return $schema->schema(SubscriptionsEditForm::getSchema());
+    //        }
+    //
+    //        // Use create form schema (creates 3 packages)
+    //        return SubscriptionsForm::configure($schema);
+    //    }
 
-//    public static function form(Schema $schema): Schema
-//    {
-//        $record = request()->route('record'); // get the model being edited
-//
-//        if ($record) {
-//            // If $record exists, we are editing
-//            return $schema->schema(SubscriptionsEditForm::getSchema());
-//        }
-//
-//        // Use create form schema (creates 3 packages)
-//        return SubscriptionsForm::configure($schema);
-//    }
+    //    public static function form(Schema $schema): Schema
+    //    {
+    //        $record = request()->route('record'); // get the model being edited
+    //
+    //        if ($record) {
+    //            // If $record exists, we are editing
+    //            return $schema->schema(SubscriptionsEditForm::getSchema());
+    //        }
+    //
+    //        // Use create form schema (creates 3 packages)
+    //        return SubscriptionsForm::configure($schema);
+    //    }
 
     public static function infolist(Schema $schema): Schema
     {
@@ -100,8 +100,4 @@ class SubscriptionsResource extends Resource
                 SoftDeletingScope::class,
             ]);
     }
-
-
-
-
 }

@@ -11,7 +11,7 @@ use App\Filament\Resources\CreditPlans\Schemas\CreditPlanForm;
 use App\Filament\Resources\CreditPlans\Schemas\CreditPlanInfolist;
 use App\Filament\Resources\CreditPlans\Tables\CreditPlansTable;
 use App\Filament\Resources\CreditPlans\Widgets\CreditTransactionsTable;
-use App\Models\Admin\CreditPlan;
+use App\Models\Subscription\CreditPlan;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -75,5 +75,4 @@ class CreditPlanResource extends Resource
             CreditTransactionsTable::class,
         ];
     }
-
 }

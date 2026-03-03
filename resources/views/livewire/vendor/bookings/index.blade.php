@@ -8,7 +8,8 @@
                 <div>
                     <h1 class="text-4xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                         <div class="w-12 h-12 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <flux:icon.document-text class="w-6 h-6 text-green-600 dark:text-green-400" />
+                            {{-- <flux:icon.document-text class="w-6 h-6 text-green-600 dark:text-green-400" /> --}}
+                            <x-heroicon-o-currency-dollar/>
                         </div>
                         Total Bookings
                     </h1>

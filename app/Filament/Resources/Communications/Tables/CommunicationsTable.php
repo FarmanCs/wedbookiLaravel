@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Communications\Tables;
 
 use App\Models\Admin\Notification;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
@@ -29,7 +30,7 @@ class CommunicationsTable
                 TextColumn::make('message')
                     ->label('Message')
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record->message),
+                    ->tooltip(fn($record) => $record->message),
 
                 BadgeColumn::make('type')
                     ->label('Type')
@@ -67,7 +68,7 @@ class CommunicationsTable
 
             ])
             ->filters([
-                TrashedFilter::make(),
+                // TrashedFilter::make(),
             ])
             ->recordActions([
                 ViewAction::make()
@@ -87,7 +88,8 @@ class CommunicationsTable
                         TextColumn::make('updated_at')->label('Updated')->dateTime('d M Y H:i'),
                     ]),
 
-                EditAction::make(),
+                // EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

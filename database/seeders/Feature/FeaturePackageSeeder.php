@@ -2,6 +2,7 @@
 
 namespace Database\Seeders\Feature;
 
+use App\Models\Business\Package;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -9,7 +10,7 @@ class FeaturePackageSeeder extends Seeder
 {
     public function run(): void
     {
-        $packages = \App\Models\Feature\AdminPackage::all();
+        $packages = Package::all();
         $features = \App\Models\Feature\Feature::all();
         $featureCount = $features->count();
 
@@ -25,7 +26,7 @@ class FeaturePackageSeeder extends Seeder
 
             foreach ($randomFeatures as $featureId) {
                 DB::table('feature_package')->insert([
-                    'admin_package_id' => $package->id,
+                    'package_id' => $package->id,
                     'feature_id' => $featureId,
                     'created_at' => now(),
                     'updated_at' => now(),

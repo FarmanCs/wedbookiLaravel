@@ -19,14 +19,14 @@ class CategoryForm
                 FileUpload::make('image')
                     ->label('Image')
                     ->image()
-                    ->disk('s3')
+                    ->disk('public')
                     ->directory('categories')
                     ->visibility('public')
-                    ->imageEditor()
-                    ->saveUploadedFileUsing(function ($file) {
-                        $path = $file->storePublicly('categories', 's3');
-                        return Storage::disk('s3')->url($path);
-                    }),
+                    ->imageEditor(),
+                // ->saveUploadedFileUsing(function ($file) {
+                //     $path = $file->storePublicly('categories', 's3');
+                //     return Storage::disk('s3')->url($path);
+                // }),
                 TextInput::make('type')
                     ->label('Category Name')
                     ->required()
