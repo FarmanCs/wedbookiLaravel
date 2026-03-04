@@ -1,10 +1,12 @@
 <?php
 
 use App\Livewire\Host\HostDashboard\HostDashboard;
+use App\Livewire\Venue\VenueIndex;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use \App\Livewire\Host\Auth\HostSignup;
+use App\Livewire\Venue\Detail;
 use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
@@ -38,10 +40,6 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     });
 });
 
-
-
-
-
 Route::prefix('host')->name('host.')->group(function () {
     // Guest Routes (Not Authenticated)
     Route::middleware('guest')->group(function () {
@@ -60,30 +58,27 @@ Route::prefix('host')->name('host.')->group(function () {
         Route::get('/dashboard', HostDashboard::class)->name('host-dashboard');
         Route::get('/host/vendors/category/{category}', \App\Livewire\Host\Vendors\CategoryPage::class)
             ->name('host.vendors.category');
+
         // Vendors
         Route::prefix('vendors')->name('vendors.')->group(function () {
             Route::get('/', \App\Livewire\Host\Vendors\Index::class)->name('index');
             Route::get('/{business}', \App\Livewire\Host\Vendors\Detail::class)->name('detail');
         });
 
+        // Venues - Using Livewire Components
         Route::prefix('venues')->name('venues.')->group(function () {
-            Route::get('/', \App\Livewire\Host\Vendors\Index::class)->name('index');
-            Route::get('/{business}', \App\Livewire\Host\Vendors\Detail::class)->name('detail');
+            Route::get('/', VenueIndex::class)->name('index');
+            Route::get('/{venue}', Detail::class)->name('detail');
         });
-
 
         // Bookings
         Route::prefix('bookings')->name('bookings.')->group(function () {
             Route::get('/', \App\Livewire\Host\Bookings\Index::class)->name('index');
-            //            Route::get('/create', \App\Livewire\Host\Bookings\Create::class)->name('create');
-            //            Route::get('/{booking}', \App\Livewire\Host\Bookings\Show::class)->name('show');
-            //            Route::get('/{booking}/edit', \App\Livewire\Host\Bookings\Edit::class)->name('edit');
         });
 
         // Guests
         Route::prefix('guests')->name('guests.')->group(function () {
             Route::get('/', \App\Livewire\Host\Guests\Index::class)->name('index');
-            //            Route::get('/groups', \App\Livewire\Host\Guests\Groups::class)->name('groups');
         });
 
         // Checklists
@@ -91,8 +86,6 @@ Route::prefix('host')->name('host.')->group(function () {
             Route::get('/', \App\Livewire\Host\Checklists\Personalized::class)->name('index');
             Route::get('/personalized', \App\Livewire\Host\Checklists\Personalized::class)->name('personalized');
         });
-
-
 
         // Logout
         Route::post('/logout', function () {
@@ -104,8 +97,16 @@ Route::prefix('host')->name('host.')->group(function () {
     });
 });
 
+// Public Venue Listing (Optional - for non-authenticated users)
+Route::prefix('wedding-venues')->name('wedding-venues.')->group(function () {
+    Route::get('/', VenueIndex::class)->name('index');
+    Route::get('/{venue}', Detail::class)->name('detail');
+});
 
-
+// Search route that maps to venue listing
+Route::get('/search', function () {
+    return app(\App\Livewire\Venue\VenueIndex::class)->render();
+})->name('search');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])

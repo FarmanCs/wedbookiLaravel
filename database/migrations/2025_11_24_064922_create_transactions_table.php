@@ -14,6 +14,7 @@ return new class extends Migration
             $table->foreignId('host_id')->constrained('hosts')->onDelete('cascade');
             $table->foreignId('vendor_id')->constrained('vendors')->onDelete('cascade');
             $table->decimal('amount', 15, 2);
+            $table->string('type')->default('payment');
             $table->enum('status', ['initiated', 'successful', 'failed', 'refunded'])->default('initiated');
             $table->string('payment_method')->nullable();
             $table->string('payment_reference')->nullable();
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->string('profile_id')->nullable();
             $table->string('tran_type')->nullable();
             $table->string('tran_class')->nullable();
+            $table->json('metadata')->nullable();
             $table->string('cart_id')->nullable();
             $table->string('cart_currency')->nullable();
             $table->text('comments')->nullable();

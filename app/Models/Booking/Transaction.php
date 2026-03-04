@@ -38,6 +38,7 @@ class Transaction extends Model
         'click_pay_response',
         'click_pay_callback',
         'paid_at',
+        'metadata',
     ];
 
     protected $casts = [
@@ -46,6 +47,7 @@ class Transaction extends Model
         'click_pay_response' => 'json',
         'click_pay_callback' => 'json',
         'paid_at' => 'datetime',
+        'metadata' => 'array',
     ];
 
     // Relationships
