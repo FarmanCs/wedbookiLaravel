@@ -14,7 +14,7 @@
                     <input
                         type="text"
                         wire:model.live.debounce-300ms="search"
-                        placeholder="Search venues..."
+                        placeholder="Search venues or vendor..."
                         class="w-full pl-10 pr-4 py-2 border-2 border-slate-200 dark:border-stone-600 rounded-full bg-white dark:bg-stone-700 text-slate-900 dark:text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
                     />
                 </div>
@@ -25,31 +25,35 @@
         </div>
     </div>
 
-    <!-- Category Chips -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div class="flex flex-wrap items-center gap-3">
-            <span class="text-sm font-medium text-slate-700 dark:text-slate-200 mr-2">Popular categories:</span>
-            @php
-                $categories = [
-                    ['name' => 'Cakes And Bakes', 'icon' => 'cake'],
-                    ['name' => 'Car Rentals', 'icon' => 'truck'],
-                    ['name' => 'Carts And Stalls', 'icon' => 'shopping-cart'],
-                    ['name' => 'Catering', 'icon' => 'building-restaurant'],
-                    ['name' => 'Décor', 'icon' => 'sparkles'],
-                    ['name' => 'Entertainment', 'icon' => 'musical-note'],
-                ];
-            @endphp
-            @foreach($categories as $cat)
-                <button
-                    wire:click="$set('search', '{{ $cat['name'] }}')"
-                    class="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-slate-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-slate-700 dark:text-slate-200 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:shadow-md transition-all"
-                >
-                    <flux:icon.{{ $cat['icon'] }} class="w-4 h-4" />
-                    <span class="text-sm font-medium">{{ $cat['name'] }}</span>
-                </button>
-            @endforeach
+    <!-- Category Chips (Dynamic from DB) -->
+    @if($categories->count())
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="text-sm font-medium text-slate-700 dark:text-slate-200 mr-2">Popular categories:</span>
+                @foreach($categories as $cat)
+                    <button
+                        wire:click="$set('category', '{{ $cat->id }}')"
+                        class="inline-flex items-center gap-2 px-4 py-2 rounded-full border-2 border-slate-200 dark:border-stone-700 bg-white dark:bg-stone-800 text-slate-700 dark:text-slate-200 hover:border-emerald-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:shadow-md transition-all {{ $category == $cat->id ? 'border-emerald-500 text-emerald-600 dark:text-emerald-400' : '' }}"
+                    >
+                        @if($cat->image)
+                            <img src="{{ $cat->image }}" class="w-4 h-4 rounded-full" alt="">
+                        @else
+                            <flux:icon.tag class="w-4 h-4" />
+                        @endif
+                        <span class="text-sm font-medium">{{ $cat->type }}</span>
+                    </button>
+                @endforeach
+                @if($category)
+                    <button
+                        wire:click="$set('category', '')"
+                        class="text-xs text-emerald-600 hover:underline ml-2"
+                    >
+                        Clear
+                    </button>
+                @endif
+            </div>
         </div>
-    </div>
+    @endif
 
     <!-- Main Content -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
@@ -62,37 +66,35 @@
                         Filters
                     </h3>
 
-                    <!-- Sub Category -->
+                    <!-- Category Dropdown -->
                     <div class="mb-8">
                         <h4 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
                             <flux:icon.building-library class="w-4 h-4 text-emerald-600" />
-                            Sub Category
+                            Category
                         </h4>
-                        <div class="space-y-3">
-                            @foreach(['outdoor' => 'Outdoor', 'rooftop' => 'Rooftop', 'indoor' => 'Indoor', 'park' => 'Park'] as $value => $label)
-                                <label class="flex items-center gap-3 cursor-pointer group">
-                                    <input
-                                        type="radio"
-                                        name="venue_type"
-                                        value="{{ $value }}"
-                                        wire:model.live="venue_type"
-                                        class="w-4 h-4 border-2 border-slate-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-stone-800 cursor-pointer"
-                                    />
-                                    <span class="text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">{{ $label }}</span>
-                                </label>
+                        <select wire:model.live="category" class="w-full px-3 py-2 border-2 border-slate-200 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 text-slate-900 dark:text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                            <option value="">All Categories</option>
+                            @foreach($categories as $cat)
+                                <option value="{{ $cat->id }}">{{ $cat->type }}</option>
                             @endforeach
-                            <label class="flex items-center gap-3 cursor-pointer group">
-                                <input
-                                    type="radio"
-                                    name="venue_type"
-                                    value=""
-                                    wire:model.live="venue_type"
-                                    class="w-4 h-4 border-2 border-slate-300 dark:border-stone-600 text-emerald-600 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-stone-800 cursor-pointer"
-                                />
-                                <span class="text-slate-700 dark:text-slate-300 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">All Types</span>
-                            </label>
-                        </div>
+                        </select>
                     </div>
+
+                    <!-- Subcategory Dropdown (optional, only if category selected) -->
+                    @if($category && $subcategories->count())
+                        <div class="mb-8">
+                            <h4 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
+                                <flux:icon.list-bullet class="w-4 h-4 text-emerald-600" />
+                                Subcategory
+                            </h4>
+                            <select wire:model.live="subcategory" class="w-full px-3 py-2 border-2 border-slate-200 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 text-slate-900 dark:text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all">
+                                <option value="">All Subcategories</option>
+                                @foreach($subcategories as $sub)
+                                    <option value="{{ $sub->id }}">{{ $sub->type }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
 
                     <!-- Country -->
                     <div class="mb-8">
@@ -108,8 +110,8 @@
                         </select>
                     </div>
 
-                    <!-- City -->
-                    @if(!empty($country))
+                    <!-- City (only if country selected) -->
+                    @if($country && $cities->count())
                         <div class="mb-8">
                             <h4 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
                                 <flux:icon.building-office class="w-4 h-4 text-emerald-600" />
@@ -123,19 +125,6 @@
                             </select>
                         </div>
                     @endif
-
-                    <!-- Date -->
-                    <div class="mb-8">
-                        <h4 class="font-semibold text-slate-700 dark:text-slate-200 mb-4 flex items-center gap-2">
-                            <flux:icon.calendar class="w-4 h-4 text-emerald-600" />
-                            Date
-                        </h4>
-                        <input
-                            type="date"
-                            class="w-full px-3 py-2 border-2 border-slate-200 dark:border-stone-600 rounded-lg bg-white dark:bg-stone-700 text-slate-900 dark:text-white focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
-                        />
-                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Check availability (demo)</p>
-                    </div>
 
                     <!-- Capacity -->
                     <div class="mb-8">
@@ -211,12 +200,12 @@
                                 <option value="capacity">Capacity</option>
                                 <option value="name">Name</option>
                             </select>
+                            <button wire:click="$set('sort_order', '{{ $sort_order === 'asc' ? 'desc' : 'asc' }}')" class="p-2 border-2 border-slate-200 dark:border-stone-600 rounded-lg hover:bg-slate-100 dark:hover:bg-stone-700 transition">
+                                <flux:icon.arrow-up class="w-4 h-4 {{ $sort_order === 'desc' ? 'rotate-180' : '' }}" />
+                            </button>
                         </div>
                     @endif
                 </div>
-
-                <!-- Search results text -->
-                <p class="text-slate-500 dark:text-slate-400 mb-6">Search results</p>
 
                 @if($venues->count() > 0)
                     <!-- Venue Grid -->
@@ -269,14 +258,9 @@
                         @endforeach
                     </div>
 
-                    <!-- Pagination / Show More -->
-                    <div class="flex flex-col items-center gap-4">
+                    <!-- Pagination -->
+                    <div class="mt-8">
                         {{ $venues->links('pagination::tailwind') }}
-                        @if($venues->hasMorePages())
-                            <button wire:click="loadMore" class="text-emerald-600 dark:text-emerald-400 font-medium hover:underline flex items-center gap-1">
-                                Show 12 More <flux:icon.chevron-down class="w-4 h-4" />
-                            </button>
-                        @endif
                     </div>
                 @else
                     <!-- Empty State -->
@@ -286,7 +270,7 @@
                         </div>
                         <h3 class="text-3xl font-bold text-slate-900 dark:text-white mb-3">NO RESULTS FOUND</h3>
                         <p class="text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-8">
-                            It looks like there are no vendors matching your current criteria.<br>
+                            It looks like there are no venues matching your current criteria.<br>
                             Try adjusting your search filters or broadening your selection.
                         </p>
                         <button

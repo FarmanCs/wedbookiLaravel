@@ -2,6 +2,7 @@
 
 use App\Livewire\Host\HostDashboard\HostDashboard;
 use App\Livewire\Venue\VenueIndex;
+use App\Livewire\Vendor\WeddingVendors;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
@@ -103,9 +104,12 @@ Route::prefix('wedding-venues')->name('wedding-venues.')->group(function () {
     Route::get('/{venue}', Detail::class)->name('detail');
 });
 
+Route::get('/wedding-vendors', WeddingVendors::class)
+    ->name('wedding-vendors.index');
+
 // Search route that maps to venue listing
 Route::get('/search', function () {
-    return app(\App\Livewire\Venue\VenueIndex::class)->render();
+    return app(VenueIndex::class)->render();
 })->name('search');
 
 Route::view('dashboard', 'dashboard')

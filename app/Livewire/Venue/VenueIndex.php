@@ -3,9 +3,12 @@
 namespace App\Livewire\Venue;
 
 use App\Models\Business\Venue;
+use App\Models\Category\Category;
+use App\Models\Category\SubCategory;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Database\Eloquent\Builder;
 
 #[Layout('components.layouts.vendor.vendor')]
 class VenueIndex extends Component
@@ -14,7 +17,8 @@ class VenueIndex extends Component
 
     // Search and filter properties
     public $search = '';
-    public $venue_type = '';
+    public $category = '';
+    public $subcategory = '';
     public $country = '';
     public $city = '';
     public $min_capacity = '';
@@ -28,35 +32,34 @@ class VenueIndex extends Component
     public $showFilters = false;
     public $isLoading = false;
 
-    // Pagination
+    // Sync filters with URL query string
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'category' => ['except' => ''],
+        'subcategory' => ['except' => ''],
+        'country' => ['except' => ''],
+        'city' => ['except' => ''],
+        'min_capacity' => ['except' => ''],
+        'max_capacity' => ['except' => ''],
+        'min_price' => ['except' => ''],
+        'max_price' => ['except' => ''],
+        'sort_by' => ['except' => 'created_at'],
+        'sort_order' => ['except' => 'desc'],
+    ];
+
     protected $paginationTheme = 'tailwind';
 
-    /**
-     * Mount the component and initialize default values
-     */
     public function mount()
     {
-        // Initialize with URL query parameters if they exist
-        $this->search = request('search', '');
-        $this->venue_type = request('venue_type', '');
-        $this->country = request('country', '');
-        $this->city = request('city', '');
-        $this->min_capacity = request('min_capacity', '');
-        $this->max_capacity = request('max_capacity', '');
-        $this->min_price = request('min_price', '');
-        $this->max_price = request('max_price', '');
-        $this->sort_by = request('sort_by', 'created_at');
-        $this->sort_order = request('sort_order', 'desc');
+        // Optionally initialize from request (Livewire handles via queryString)
     }
 
-    /**
-     * Reset all filters to their default values
-     */
     public function resetFilters()
     {
         $this->reset([
             'search',
-            'venue_type',
+            'category',
+            'subcategory',
             'country',
             'city',
             'min_capacity',
@@ -66,44 +69,75 @@ class VenueIndex extends Component
             'sort_by',
             'sort_order'
         ]);
+        $this->resetPage();
+    }
 
+    public function updatedCategory()
+    {
+        $this->subcategory = ''; // Reset subcategory when category changes
+        $this->resetPage();
+    }
+
+    public function updatedSubcategory()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedCountry()
+    {
+        $this->city = ''; // Reset city when country changes
+        $this->resetPage();
+    }
+
+    public function updatedCity()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedMinCapacity()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedMaxCapacity()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedMinPrice()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedMaxPrice()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSortBy()
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSortOrder()
+    {
         $this->resetPage();
     }
 
     /**
-     * Update the sort option and reset pagination
+     * Build the base query with all active filters.
      */
-    public function updateSort($sortBy, $sortOrder)
+    private function buildQuery(): Builder
     {
-        $this->sort_by = $sortBy;
-        $this->sort_order = $sortOrder;
-        $this->resetPage();
-    }
+        $query = Venue::where('status', 'active')
+            ->with('vendor'); // Eager load for efficiency
 
-    /**
-     * Toggle the filter panel visibility on mobile
-     */
-    public function toggleFilters()
-    {
-        $this->showFilters = !$this->showFilters;
-    }
-
-    /**
-     * Get the total count of venues matching current filters
-     */
-    public function getVenueCount()
-    {
-        return $this->buildQuery()->count();
-    }
-
-    /**
-     * Build the database query based on current filters
-     */
-    private function buildQuery()
-    {
-        $query = Venue::query();
-
-        // Text search across multiple fields
+        // Text search across venue fields and vendor name
         if (!empty($this->search)) {
             $search = $this->search;
             $query->where(function ($q) use ($search) {
@@ -111,49 +145,52 @@ class VenueIndex extends Component
                     ->orWhere('city', 'like', "%{$search}%")
                     ->orWhere('state', 'like', "%{$search}%")
                     ->orWhere('country', 'like', "%{$search}%")
-                    ->orWhere('street', 'like', "%{$search}%");
+                    ->orWhere('street', 'like', "%{$search}%")
+                    ->orWhereHas('vendor', function ($vendorQuery) use ($search) {
+                        $vendorQuery->where('full_name', 'like', "%{$search}%");
+                    });
             });
         }
 
-        // Filter by venue type
-        if (!empty($this->venue_type)) {
-            $query->where('venue_type', $this->venue_type);
+        // Filter by vendor's category
+        if (!empty($this->category)) {
+            $query->whereHas('vendor', function ($q) {
+                $q->where('category_id', $this->category);
+            });
         }
 
-        // Filter by country
+        // Filter by vendor's subcategory (requires joining through businesses? 
+        // Since Vendor doesn't have direct subcategory, we'll leave this commented 
+        // unless you have a different logic. For now, we ignore subcategory filter.
+        // If you want to filter by subcategory via Business, you can add later.
+
+        // Country filter
         if (!empty($this->country)) {
             $query->where('country', $this->country);
         }
 
-        // Filter by city
+        // City filter
         if (!empty($this->city)) {
             $query->where('city', $this->city);
         }
 
-        // Filter by minimum capacity
+        // Capacity range
         if (!empty($this->min_capacity)) {
             $query->where('capacity', '>=', (int)$this->min_capacity);
         }
-
-        // Filter by maximum capacity
         if (!empty($this->max_capacity)) {
             $query->where('capacity', '<=', (int)$this->max_capacity);
         }
 
-        // Filter by minimum price
+        // Price range
         if (!empty($this->min_price)) {
             $query->where('price', '>=', (int)$this->min_price);
         }
-
-        // Filter by maximum price
         if (!empty($this->max_price)) {
             $query->where('price', '<=', (int)$this->max_price);
         }
 
-        // Only show active venues
-        $query->where('status', 'active');
-
-        // Apply sorting with validation to prevent SQL injection
+        // Sorting
         if (in_array($this->sort_by, ['created_at', 'price', 'capacity', 'name'])) {
             $query->orderBy($this->sort_by, $this->sort_order);
         }
@@ -162,17 +199,46 @@ class VenueIndex extends Component
     }
 
     /**
-     * Get the paginated venues based on filters
+     * Get paginated venues.
      */
-    public function getVenues()
+    public function getVenuesProperty()
     {
         return $this->buildQuery()->paginate(12);
     }
 
     /**
-     * Get unique countries for the filter dropdown
+     * Get total count of venues matching current filters.
      */
-    public function getCountries()
+    public function getVenueCountProperty()
+    {
+        return $this->buildQuery()->count();
+    }
+
+    /**
+     * Get all categories for filter dropdown/chips.
+     */
+    public function getCategoriesProperty()
+    {
+        return Category::orderBy('type')->get();
+    }
+
+    /**
+     * Get subcategories based on selected category.
+     */
+    public function getSubcategoriesProperty()
+    {
+        if (empty($this->category)) {
+            return collect();
+        }
+        return SubCategory::where('category_id', $this->category)
+            ->orderBy('type')
+            ->get();
+    }
+
+    /**
+     * Get unique countries from active venues.
+     */
+    public function getCountriesProperty()
     {
         return Venue::where('status', 'active')
             ->select('country')
@@ -182,32 +248,29 @@ class VenueIndex extends Component
     }
 
     /**
-     * Get cities for the selected country
+     * Get unique cities (optionally filtered by selected country).
      */
-    public function getCities()
+    public function getCitiesProperty()
     {
         $query = Venue::where('status', 'active');
-
         if (!empty($this->country)) {
             $query->where('country', $this->country);
         }
-
         return $query->select('city')
             ->distinct()
             ->orderBy('city')
             ->pluck('city');
     }
 
-    /**
-     * Render the component view
-     */
     public function render()
     {
         return view('livewire.venue.venue-index', [
-            'venues' => $this->getVenues(),
-            'countries' => $this->getCountries(),
-            'cities' => $this->getCities(),
-            'venueCount' => $this->getVenueCount(),
+            'venues' => $this->venues,
+            'venueCount' => $this->venueCount,
+            'categories' => $this->categories,
+            'subcategories' => $this->subcategories,
+            'countries' => $this->countries,
+            'cities' => $this->cities,
         ]);
     }
 }

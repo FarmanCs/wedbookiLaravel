@@ -3,38 +3,45 @@
 namespace App\Livewire\Venue;
 
 use App\Models\Business\Venue;
+use App\Models\Booking\Review;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Carbon\Carbon;
 
+#[Layout('components.layouts.vendor.vendor')]
 class Detail extends Component
 {
-    /**
-     * The venue instance
-     */
     public Venue $venue;
-
-    /**
-     * Current selected image index for the gallery
-     */
     public $selectedImageIndex = 0;
-
-    /**
-     * Show enlarged image modal
-     */
     public $showImageModal = false;
+    public $relatedVenues;
+    public $vendor;
+    public $packages;
+    public $services;
+    public $reviews;
 
-    /**
-     * Related venues from the same city
-     */
-    public $relatedVenues = [];
-
-    /**
-     * Mount the component with the venue
-     */
     public function mount(Venue $venue)
     {
-        $this->venue = $venue;
+        // Load venue with vendor
+        $this->venue = $venue->load('vendor');
 
-        // Load related venues from the same city
+        $this->vendor = $this->venue->vendor;
+
+        if ($this->vendor) {
+            // Load packages and services
+            $this->packages = $this->vendor->packages;
+            $this->services = $this->vendor->services;
+
+            // Get reviews from all businesses of this vendor
+            $businessIds = $this->vendor->businesses()->pluck('id');
+            $this->reviews = Review::whereIn('business_id', $businessIds)
+                ->with('host')  // Assuming 'host' relation exists on Review
+                ->latest()
+                ->take(5)
+                ->get();
+        }
+
+        // Related venues from same city, excluding current
         $this->relatedVenues = Venue::where('city', $venue->city)
             ->where('id', '!=', $venue->id)
             ->where('status', 'active')
@@ -42,9 +49,6 @@ class Detail extends Component
             ->get();
     }
 
-    /**
-     * Select an image to display
-     */
     public function selectImage($index)
     {
         if (is_array($this->venue->images) && isset($this->venue->images[$index])) {
@@ -52,74 +56,62 @@ class Detail extends Component
         }
     }
 
-    /**
-     * Toggle the image modal
-     */
     public function toggleImageModal()
     {
         $this->showImageModal = !$this->showImageModal;
     }
 
-    /**
-     * Get the current selected image
-     */
     public function getCurrentImage()
     {
         $images = $this->venue->images ?? [];
-
         if (is_array($images) && isset($images[$this->selectedImageIndex])) {
             return $images[$this->selectedImageIndex];
         }
-
         return null;
     }
 
-    /**
-     * Check if venue has multiple images
-     */
     public function hasMultipleImages()
     {
         return is_array($this->venue->images) && count($this->venue->images) > 1;
     }
 
-    /**
-     * Get available dates formatted for display
-     */
     public function getFormattedDates()
     {
         if (!is_array($this->venue->available_dates) || empty($this->venue->available_dates)) {
             return 'Contact venue for availability';
         }
 
-        return implode(', ', array_map(function ($date) {
-            return date('M d, Y', strtotime($date));
-        }, array_slice($this->venue->available_dates, 0, 5)));
+        return collect(array_slice($this->venue->available_dates, 0, 5))
+            ->map(fn($date) => Carbon::parse($date)->format('M d, Y'))
+            ->implode(', ');
     }
 
-    /**
-     * Format timings for display
-     */
     public function getFormattedTimings()
     {
         if (!is_array($this->venue->timings) || empty($this->venue->timings)) {
-            return ['Morning' => 'Not available', 'Afternoon' => 'Not available', 'Evening' => 'Not available'];
+            return [
+                'Monday - Friday' => '9:00 AM - 6:00 PM',
+                'Saturday'       => '10:00 AM - 4:00 PM',
+                'Sunday'         => 'Closed',
+            ];
         }
 
         return $this->venue->timings;
     }
 
-    /**
-     * Render the component
-     */
     public function render()
     {
         return view('livewire.venue.detail', [
-            'venue' => $this->venue,
-            'relatedVenues' => $this->relatedVenues,
-            'currentImage' => $this->getCurrentImage(),
+            'venue'             => $this->venue,
+            'vendor'            => $this->vendor,
+            'packages'          => $this->packages ?? collect(),
+            'services'          => $this->services ?? collect(),
+            'reviews'           => $this->reviews ?? collect(),
+            'relatedVenues'     => $this->relatedVenues,
+            'currentImage'      => $this->getCurrentImage(),
             'hasMultipleImages' => $this->hasMultipleImages(),
-            'formattedDates' => $this->getFormattedDates(),
-            'formattedTimings' => $this->getFormattedTimings(),
+            'formattedDates'    => $this->getFormattedDates(),
+            'formattedTimings'  => $this->getFormattedTimings(),
         ]);
     }
 }
