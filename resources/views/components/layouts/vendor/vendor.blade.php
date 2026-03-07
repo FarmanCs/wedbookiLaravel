@@ -38,7 +38,7 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
                                                         </a>
                             <a href="{{ route('wedding-vendors.index') }}"
                                 class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-medium">VENDORS</a>
-                            <a href="#"
+                            <a href="{{ route('wedding-planner') }}"
                                 class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-medium">PLANNING
                                 TOOLS</a>
                         </div>

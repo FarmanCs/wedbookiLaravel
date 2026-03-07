@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use \App\Livewire\Host\Auth\HostSignup;
+use App\Livewire\Vendor\Plan\WeddingPlanner;
 use App\Livewire\Venue\Detail;
 use Illuminate\Support\Facades\Auth;
 
@@ -107,7 +108,10 @@ Route::prefix('wedding-venues')->name('wedding-venues.')->group(function () {
 Route::get('/wedding-vendors', WeddingVendors::class)
     ->name('wedding-vendors.index');
 
-// Search route that maps to venue listing
+
+Route::get('/wedding-planner', WeddingPlanner::class)->name('wedding-planner');
+
+// Search route that maps to venue listing  
 Route::get('/search', function () {
     return app(VenueIndex::class)->render();
 })->name('search');

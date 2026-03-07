@@ -21,40 +21,55 @@
                 <!-- Carousel Container -->
                 <div class="relative mb-12 group" 
                      x-data="{
-                         scrollContainer: null,
+                         canScrollLeft: false,
+                         canScrollRight: false,
                          init() {
-                             this.scrollContainer = this.$refs.container;
+                             this.$nextTick(() => {
+                                 this.updateScrollState();
+                             });
+                         },
+                         updateScrollState() {
+                             const container = this.$refs.container;
+                             if (!container) return;
+                             this.canScrollLeft = container.scrollLeft > 0;
+                             this.canScrollRight = container.scrollLeft < (container.scrollWidth - container.clientWidth);
                          },
                          scroll(direction) {
-                             const container = this.scrollContainer;
-                             const scrollAmount = 320; // card width + gap
+                             const container = this.$refs.container;
+                             if (!container) return;
+                             const cardWidth = container.querySelector('.snap-start')?.offsetWidth || 288;
+                             const gap = 20; // matches space-x-5
+                             const scrollAmount = cardWidth + gap;
                              container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+                             // Update scroll state after animation
+                             setTimeout(() => this.updateScrollState(), 300);
                          }
                      }">
                     
                     <!-- Left Scroll Button -->
                     <button @click="scroll(-1)" 
                             class="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full p-3 shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 disabled:opacity-30 hover:scale-110 border border-gray-200 dark:border-gray-700"
-                            :disabled="scrollContainer?.scrollLeft <= 0">
+                            :disabled="!canScrollLeft">
                         <flux:icon name="chevron-left" class="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     </button>
 
                     <!-- Right Scroll Button -->
                     <button @click="scroll(1)" 
                             class="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-full p-3 shadow-xl opacity-0 group-hover:opacity-100 transition-all duration-300 disabled:opacity-30 hover:scale-110 border border-gray-200 dark:border-gray-700"
-                            :disabled="scrollContainer?.scrollLeft >= (scrollContainer?.scrollWidth - scrollContainer?.clientWidth)">
+                            :disabled="!canScrollRight">
                         <flux:icon name="chevron-right" class="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     </button>
 
                     <!-- Scrollable Cards (scrollbar hidden) -->
                     <div x-ref="container" 
+                         @scroll="updateScrollState"
                          class="flex overflow-x-hidden space-x-5 pb-6 scrollbar-hide scroll-smooth snap-x snap-mandatory">
                         @foreach($businesses as $business)
                             <div class="flex-none w-72 snap-start">
                                 <!-- Card with consistent height -->
-                                <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-amber-950 group/card flex flex-col h-full">
+                                <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100 dark:border-gray-700 hover:border-amber-500 dark:hover:border-amber-600 group/card flex flex-col h-full">
                                     <!-- Business Image -->
-                                    <div class="h-40 bg-gradient-to-br from-amber-100 to-pink-900 dark:from-gray-700 dark:to-stone-950 relative flex-shrink-0">
+                                    <div class="h-40 bg-gradient-to-br from-zinc-100 to-gray-100 dark:from-gray-700 dark:to-stone-950 relative flex-shrink-0">
                                         @if($business->profile_image)
                                             <img src="{{ Storage::url($business->profile_image) }}" 
                                                  alt="{{ $business->company_name }}" 
@@ -131,9 +146,14 @@
                                                     @endif
                                                 </div>
                                             </div>
-                                            <a href="#" class="inline-flex items-center px-4 py-2 bg-amber-600 hover:bg-amber-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition-colors shadow-md hover:shadow-lg">
+                                            <!-- Flux Button with custom warm colors -->
+                                            <flux:button href="#" 
+                                                         size="sm" 
+                                                         class="!bg-gray-200 hover:!bg-pink-700 dark:!bg-gray-700 dark:hover:!bg-gray-600 !text-white !border-none"
+                                                         icon="arrow-right" 
+                                                         icon-position="right">
                                                 Check Availability
-                                            </a>
+                                            </flux:button>
                                         </div>
                                     </div>
                                 </div>
