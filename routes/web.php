@@ -1,12 +1,16 @@
 <?php
 
 use App\Livewire\Host\HostDashboard\HostDashboard;
+use App\Livewire\Vendor\Dashboard\VendorDashboard;
 use App\Livewire\Venue\VenueIndex;
 use App\Livewire\Vendor\WeddingVendors;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use \App\Livewire\Host\Auth\HostSignup;
+use App\Livewire\Vendor\Business\CreateEditBusiness;
+use App\Livewire\Vendor\Business\VendorBusiness;
+use App\Livewire\Vendor\Packages\Packages;
 use App\Livewire\Vendor\Plan\WeddingPlanner;
 use App\Livewire\Venue\Detail;
 use Illuminate\Support\Facades\Auth;
@@ -25,10 +29,11 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
             return 'Forgot Password Page';
         })->name('forgot-password');
     });
+
     // Authenticated Routes
     Route::middleware('auth:vendor')->group(function () {
-        // Dashboard (already exists, rename if needed)
-        Route::get('/dashboard', \App\Livewire\Vendor\Dashboard\Index::class)->name('dashboard');
+        // Dashboard
+        Route::get('/dashboard', VendorDashboard::class)->name('dashboard');
 
         // New pages
         Route::get('/calendar', \App\Livewire\Vendor\Calendar\Index::class)->name('calendar');
@@ -38,7 +43,18 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
         Route::get('/reviews', \App\Livewire\Vendor\Reviews\Index::class)->name('reviews');
         Route::get('/bookings', \App\Livewire\Vendor\Bookings\Index::class)->name('bookings');
         Route::get('/analytics', \App\Livewire\Vendor\Analytics\Index::class)->name('analytics');
-        Route::get('/profile', \App\Livewire\Vendor\Profile\Index::class)->name('profile'); // For vendor profile editing
+
+        Route::prefix('business')->name('business.')->group(function () {
+            Route::get('/', VendorBusiness::class)->name('index');           // vendor.business.index
+            Route::get('/create', CreateEditBusiness::class)->name('create'); // vendor.business.create
+            Route::get('/{business}/edit', CreateEditBusiness::class)->name('edit'); // vendor.business.edit
+        });
+
+        // Packages
+        Route::get('/packages', Packages::class)->name('packages');
+
+        // Profile
+        Route::get('/profile', \App\Livewire\Vendor\Profile\Index::class)->name('profile');
     });
 });
 
@@ -107,7 +123,6 @@ Route::prefix('wedding-venues')->name('wedding-venues.')->group(function () {
 
 Route::get('/wedding-vendors', WeddingVendors::class)
     ->name('wedding-vendors.index');
-
 
 Route::get('/wedding-planner', WeddingPlanner::class)->name('wedding-planner');
 
