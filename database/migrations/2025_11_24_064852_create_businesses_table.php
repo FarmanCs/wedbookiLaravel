@@ -48,6 +48,8 @@ return new class extends Migration {
             $table->string('chat_image')->nullable();
             $table->string('chat_video')->nullable();
             $table->string('chat_document')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->boolean('account_deactivated')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

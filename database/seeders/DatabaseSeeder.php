@@ -41,7 +41,6 @@ class DatabaseSeeder extends Seeder
             \Database\Seeders\Business\BusinessSeeder::class,
 
             // Vendor Packages & Timings (depends on vendors/businesses)
-            \Database\Seeders\Vendor\VendorPackageSeeder::class,
             \Database\Seeders\Vendor\VendorTimingSeeder::class,
 
             // Business related (packages, services, venues, extra services)

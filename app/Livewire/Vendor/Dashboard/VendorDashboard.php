@@ -492,7 +492,7 @@ class VendorDashboard extends Component
 
     public function render()
     {
-        return view('livewire.vendor.dashboard.index', [
+        return view('livewire.vendor.dashboard.vendor-dashboard', [
             'vendor' => $this->vendor,
             'pageVisitors' => $this->pageVisitors,
             'totalBookings' => $this->totalBookings,

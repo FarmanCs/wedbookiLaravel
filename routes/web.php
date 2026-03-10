@@ -12,6 +12,7 @@ use App\Livewire\Vendor\Business\CreateEditBusiness;
 use App\Livewire\Vendor\Business\VendorBusiness;
 use App\Livewire\Vendor\Packages\Packages;
 use App\Livewire\Vendor\Plan\WeddingPlanner;
+use App\Livewire\Vendor\VendorDetail;
 use App\Livewire\Venue\Detail;
 use Illuminate\Support\Facades\Auth;
 
@@ -123,6 +124,14 @@ Route::prefix('wedding-venues')->name('wedding-venues.')->group(function () {
 
 Route::get('/wedding-vendors', WeddingVendors::class)
     ->name('wedding-vendors.index');
+
+Route::get('/vendor/{vendorId}', VendorDetail::class)
+    ->name('vendor.detail')
+    ->where('vendorId', '.*');
+
+Route::get('/vendors/{slug}-{vendorId}', VendorDetail::class)
+    ->name('vendor.detail.slug');
+
 
 Route::get('/wedding-planner', WeddingPlanner::class)->name('wedding-planner');
 

@@ -20,10 +20,14 @@ class WeddingVendors extends Component
                 $query->with([
                     'packages',
                     'reviews'
-                ])->orderBy('company_name');
+                ])->where('is_active', true) // Only show active businesses
+                    ->orderBy('is_featured', 'desc') // Featured first
+                    ->orderBy('company_name');
             }
         ])
-            ->whereHas('businesses')
+            ->whereHas('businesses', function ($query) {
+                $query->where('is_active', true);
+            })
             ->get();
     }
 
@@ -84,6 +88,24 @@ class WeddingVendors extends Component
         return strtoupper(substr($name, 0, 2));
     }
 
+    /**
+     * Get the vendor detail page URL
+     */
+    private function vendorDetailUrl($business): string
+    {
+        // Use custom vendor ID if available, otherwise use business ID
+        $vendorId = $business->id;
+
+        // Optional: Create a slug from company name
+        $slug = str_replace(' ', '-', strtolower($business->company_name));
+
+        // Use your preferred URL format
+        return route('vendor.detail', ['vendorId' => $vendorId]);
+
+        // Or with slug:
+        // return route('vendor.detail.slug', ['slug' => $slug, 'vendorId' => $vendorId]);
+    }
+
     public function render()
     {
         $groupedBusinesses = $this->categories->mapWithKeys(function ($category) {
@@ -93,6 +115,7 @@ class WeddingVendors extends Component
                 $business->starting_price = $this->startingPrice($business);
                 $business->features = $this->getFeaturesAsArray($business);
                 $business->initials = $this->initials($business);
+                $business->detail_url = $this->vendorDetailUrl($business);
                 return $business;
             });
 

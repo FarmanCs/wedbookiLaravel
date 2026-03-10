@@ -7,6 +7,7 @@ use App\Models\Booking\Review;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 
 #[Layout('components.layouts.vendor.vendor')]
 class Detail extends Component
@@ -22,23 +23,35 @@ class Detail extends Component
 
     public function mount(Venue $venue)
     {
-        // Load venue with vendor
-        $this->venue = $venue->load('vendor');
+        // Load venue with vendor and related data
+        $this->venue = $venue->load(['vendor' => function ($query) {
+            $query->with(['businesses', 'services']);
+        }]);
 
         $this->vendor = $this->venue->vendor;
 
         if ($this->vendor) {
-            // Load packages and services
-            $this->packages = $this->vendor->packages;
-            $this->services = $this->vendor->services;
+            // Load packages from businesses (since packages belong to Business, not Vendor directly)
+            $businessIds = $this->vendor->businesses()->pluck('id');
+
+            // Get packages from all businesses
+            $this->packages = \App\Models\Business\Package::whereIn('business_id', $businessIds)
+                ->orderBy('price')
+                ->get();
+
+            // Get services from vendor
+            $this->services = $this->vendor->services ?? collect();
 
             // Get reviews from all businesses of this vendor
-            $businessIds = $this->vendor->businesses()->pluck('id');
             $this->reviews = Review::whereIn('business_id', $businessIds)
-                ->with('host')  // Assuming 'host' relation exists on Review
+                ->with('host')
                 ->latest()
                 ->take(5)
                 ->get();
+        } else {
+            $this->packages = collect();
+            $this->services = collect();
+            $this->reviews = collect();
         }
 
         // Related venues from same city, excluding current

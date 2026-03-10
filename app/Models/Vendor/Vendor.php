@@ -101,11 +101,6 @@ class Vendor extends Authenticatable
         return $this->hasMany(\App\Models\Business\Venue::class);
     }
 
-    public function packages()
-    {
-        return $this->hasMany(\App\Models\Vendor\VendorPackage::class);
-    }
-
     public function timings()
     {
         return $this->hasMany(\App\Models\Vendor\VendorTiming::class);
