@@ -234,13 +234,13 @@ class Index extends Component
 
         $timing = Timing::firstOrNew(['business_id' => $business->id]);
 
-        // Get existing timings or initialize empty array
+        // Get existing timings_venue or initialize empty array
         $timingsVenue = $timing->timings_venue ?? [];
 
-        // Filter out disabled slots and store only enabled ones
+        // Prepare the data for this date – only include slots with both times filled
         $filtered = [];
         foreach ($this->timings as $slot => $data) {
-            if ($data['enabled']) {
+            if (!empty($data['start']) && !empty($data['end'])) {
                 $filtered[$slot] = [
                     'enabled' => true,
                     'start' => $data['start'],
@@ -249,15 +249,15 @@ class Index extends Component
             }
         }
 
-        // Save for this date
         $timingsVenue[$this->selectedDate] = $filtered;
 
         $timing->timings_venue = $timingsVenue;
-        $timing->slot_duration = $this->slotDuration;
+        // If you still want to store slot_duration, keep it; otherwise you can remove it.
+        // $timing->slot_duration = $this->slotDuration;  // optional
         $timing->save();
 
         $this->closeTimingModal();
-        $this->generateCalendar(); // Refresh calendar
+        $this->generateCalendar();
         session()->flash('success', "Timings saved for " . Carbon::parse($this->selectedDate)->format('M d, Y'));
     }
 
