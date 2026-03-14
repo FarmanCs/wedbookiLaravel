@@ -5,9 +5,10 @@ namespace App\Livewire\Host\Auth;
 use App\Models\Host\Host;
 use App\Src\Services\OtpService;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-//#[]
+#[Layout('components.layouts.auth.split')]
 class HostSignup extends Component
 {
     public $full_name = '';
@@ -73,7 +74,6 @@ class HostSignup extends Component
 
             // Redirect to OTP verification
             return redirect()->route('host.verify-otp');
-
         } catch (\Exception $e) {
             \Log::error('Host Signup Error: ' . $e->getMessage());
             \Log::error('Error trace: ' . $e->getTraceAsString());
@@ -83,6 +83,6 @@ class HostSignup extends Component
 
     public function render()
     {
-        return view('livewire.auth.host-signup')->layout('components.layouts.auth.split');
+        return view('livewire.auth.host-signup');
     }
 }

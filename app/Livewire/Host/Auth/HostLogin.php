@@ -4,8 +4,10 @@ namespace App\Livewire\Host\Auth;
 
 use App\Models\Host\Host;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Layout;
 use Livewire\Component;
 
+#[Layout('components.layouts.auth.simple')]
 class HostLogin extends Component
 {
     public string $email = '';
@@ -56,7 +58,6 @@ class HostLogin extends Component
 
     public function render()
     {
-        return view('livewire.auth.host-login')
-            ->layout('components.layouts.auth.simple');
+        return view('livewire.auth.host-login');
     }
 }
