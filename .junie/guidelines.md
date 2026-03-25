@@ -8,7 +8,7 @@ The Laravel Boost guidelines are specifically curated by Laravel maintainers for
 ## Foundational Context
 This application is a Laravel application and its main Laravel ecosystems package & versions are below. You are an expert with them all. Ensure you abide by these specific packages & versions.
 
-- php - 8.4.16
+- php - 8.4.19
 - filament/filament (FILAMENT) - v4
 - laravel/fortify (FORTIFY) - v1
 - laravel/framework (LARAVEL) - v12
@@ -208,6 +208,7 @@ protected function isAccessible(User $user, ?string $path = null): bool
     <flux:button variant="primary"/>
 </code-snippet>
 
+
 ### Available Components
 This is correct as of Boost installation, but there may be additional components within the codebase.
 
@@ -244,6 +245,7 @@ avatar, badge, brand, breadcrumbs, button, callout, checkbox, dropdown, field, h
     public function updatedSearch() { $this->resetPage(); }
 </code-snippet>
 
+
 ## Testing Livewire
 
 <code-snippet name="Example Livewire Component Test" lang="php">
@@ -254,6 +256,7 @@ avatar, badge, brand, breadcrumbs, button, callout, checkbox, dropdown, field, h
         ->assertSee(1)
         ->assertStatus(200);
 </code-snippet>
+
 
 <code-snippet name="Testing Livewire Component Exists on Page" lang="php">
     $this->get('/posts/create')
@@ -407,12 +410,14 @@ $delete = fn(Product $product) => $product->delete();
 <!-- HTML / UI Here -->
 </code-snippet>
 
+
 <code-snippet name="Real-Time Search With Volt" lang="php">
     <flux:input
         wire:model.live.debounce.300ms="search"
         placeholder="Search..."
     />
 </code-snippet>
+
 
 <code-snippet name="Loading States With Volt" lang="php">
     <flux:button wire:click="save" wire:loading.attr="disabled">
@@ -518,6 +523,8 @@ it('may reset the password', function () {
 });
 </code-snippet>
 
+
+
 <code-snippet name="Pest Smoke Testing Example" lang="php">
 $pages = visit(['/', '/about', '/contact']);
 
@@ -544,6 +551,7 @@ $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
     </div>
 </code-snippet>
 
+
 ### Dark Mode
 - If existing pages and components support dark mode, new pages and components must support dark mode in a similar way, typically using `dark:`.
 
@@ -569,6 +577,7 @@ $pages->assertNoJavascriptErrors()->assertNoConsoleLogs();
    - @tailwind utilities;
    + @import "tailwindcss";
 </code-snippet>
+
 
 ### Replaced Utilities
 - Tailwind v4 removed deprecated utilities. Do not use the deprecated option; use the replacement.
