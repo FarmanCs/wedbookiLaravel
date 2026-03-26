@@ -18,13 +18,15 @@ class VendorDetail extends Component
     public array $reviews = [];
     public array $faqs = [];
     public array $portfolioImages = [];
+    public array $services = [];
+    public array $venues = [];
 
     public function mount($vendorId)
     {
-        // Fetch business by ID (or custom vendor ID)
-        // Works with or without is_active column
+        // Fetch business with all necessary relationships
         $this->business = Business::with([
             'vendor',
+            'vendor.services',
             'category',
             'subCategory',
             'packages',
@@ -47,26 +49,30 @@ class VendorDetail extends Component
         // Process features
         $this->features = $this->processFeaturesAsArray($this->business->features);
 
-        // Process packages with discount calculation
+        // Process packages - FIXED: Direct database access
         $this->packages = $this->business->packages->map(function ($package) {
+            $features = is_array($package->features)
+                ? $package->features
+                : json_decode($package->features, true) ?? [];
+
             return [
                 'id' => $package->id,
                 'name' => $package->name,
-                'price' => $package->price,
-                'discount' => $package->discount,
-                'discountPercentage' => $package->discount_percentage,
-                'originalPrice' => $package->discount ? $package->price + $package->discount : $package->price,
+                'price' => (float)$package->price,
+                'discount' => (float)($package->discount ?? 0),
+                'discountPercentage' => (float)($package->discount_percentage ?? 0),
+                'originalPrice' => (float)($package->discount ? $package->price + $package->discount : $package->price),
                 'description' => $package->description,
-                'features' => is_array($package->features) ? $package->features : json_decode($package->features, true) ?? [],
-                'isPopular' => $package->is_popular ?? false,
+                'features' => is_array($features) ? $features : [],
+                'isPopular' => (bool)($package->is_popular ?? false),
             ];
         })->toArray();
 
-        // Process reviews
+        // Process reviews - FIXED: Proper relationship access
         $this->reviews = $this->business->reviews->map(function ($review) {
             return [
                 'id' => $review->id,
-                'rating' => $review->rating,
+                'rating' => (int)$review->rating,
                 'comment' => $review->comment,
                 'reviewerName' => $review->reviewer->full_name ?? 'Anonymous',
                 'reviewerImage' => $review->reviewer->profile_image ?? null,
@@ -80,7 +86,20 @@ class VendorDetail extends Component
         // Process portfolio images
         $this->portfolioImages = is_array($this->business->portfolio_images)
             ? $this->business->portfolio_images
-            : json_decode($this->business->portfolio_images, true) ?? [];
+            : (is_string($this->business->portfolio_images) ? json_decode($this->business->portfolio_images, true) ?? [] : []);
+
+        // Process services from vendor - FIXED: Proper vendor relationship
+        if ($this->business->vendor && $this->business->vendor->services) {
+            $this->services = $this->business->vendor->services->map(function ($service) {
+                return [
+                    'id' => $service->id,
+                    'name' => $service->name,
+                    'description' => $service->description,
+                    'price' => (float)$service->price,
+                    'img' => $service->img,
+                ];
+            })->toArray();
+        }
     }
 
     /**
@@ -120,15 +139,14 @@ class VendorDetail extends Component
      */
     public function formatPrice($price): string
     {
-        return 'Rs ' . number_format($price, 2);
+        return 'Rs ' . number_format($price, 0);
     }
 
-    /**
-     * Calculate discount savings
-     */
-    public function calculateSavings($price, $discount): string
+    public function openBookingModal($type, $id)
     {
-        return $this->formatPrice($discount);
+        // Target the modal component by its name
+        $this->dispatch('openBookingModal', type: $type, id: $id)
+            ->to('booking.booking-modal');
     }
 
     /**
@@ -146,18 +164,6 @@ class VendorDetail extends Component
         return $stars;
     }
 
-    /**
-     * Get review rating stars
-     */
-    public function getReviewStars($rating): array
-    {
-        $stars = [];
-        for ($i = 1; $i <= 5; $i++) {
-            $stars[] = $i <= $rating;
-        }
-        return $stars;
-    }
-
     public function render()
     {
         return view('livewire.vendor.vendor-detail', [
@@ -170,6 +176,7 @@ class VendorDetail extends Component
             'reviews' => $this->reviews,
             'faqs' => $this->faqs,
             'portfolioImages' => $this->portfolioImages,
+            'services' => $this->services,
             'initials' => $this->getInitials(),
             'starArray' => $this->getStarArray(),
         ]);

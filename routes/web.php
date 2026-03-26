@@ -129,8 +129,8 @@ Route::get('/vendor/{vendorId}', VendorDetail::class)
     ->name('vendor.detail')
     ->where('vendorId', '.*');
 
-Route::get('/vendors/{slug}-{vendorId}', VendorDetail::class)
-    ->name('vendor.detail.slug');
+// Route::get('/vendors/{slug}-{vendorId}', VendorDetail::class)
+//     ->name('vendor.detail.slug');
 
 
 Route::get('/wedding-planner', WeddingPlanner::class)->name('wedding-planner');
