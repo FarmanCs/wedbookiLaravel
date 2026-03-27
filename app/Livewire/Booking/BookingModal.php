@@ -14,62 +14,53 @@ class BookingModal extends Component
     public $businessId;
     public $itemType;
     public $itemId;
-    public $isOpen = false;
-    public $step = 1;
+    public bool $isOpen = false;
+    public int $step = 1;
 
-    public $name = '';
-    public $email = '';
-    public $selectedDate = '';
-    public $selectedTimeSlot = '';
-    public $selectedAddons = [];
-    public $totalPrice = 0;
+    public string $name  = '';
+    public string $email = '';
+    public string $selectedDate     = '';
+    public string $selectedTimeSlot = '';
+    public array  $selectedAddons   = [];
+    public float  $totalPrice       = 0;
 
     public $business;
     public $selectedItem;
-    public $availableAddons = [];
+    public array $availableAddons = [];
 
     public function mount($businessId = null)
     {
         $this->businessId = $businessId;
+
         if ($businessId) {
             $this->business = Business::find($businessId);
             $this->loadAvailableAddons();
         }
 
         if (Auth::check()) {
-            $user = Auth::user();
-            $this->name = $user->full_name ?? '';
+            $user        = Auth::user();
+            $this->name  = $user->full_name ?? '';
             $this->email = $user->email ?? '';
         }
     }
 
     #[On('openBookingModal')]
-    public function openModal($type, $id)
+    public function openModal(string $type, int $id): void
     {
-        // Log that the event was received (optional, check storage/logs/laravel.log)
-        \Log::info('BookingModal openModal called', ['type' => $type, 'id' => $id]);
+        $this->itemType = $type;
+        $this->itemId   = $id;
 
-        try {
-            $this->itemType = $type;
-            $this->itemId = $id;
-            $this->loadSelectedItem();
+        $this->loadSelectedItem();
 
-            if (!$this->selectedItem) {
-                session()->flash('error', 'The selected item could not be found.');
-                $this->isOpen = false;
-                return;
-            }
-
-            $this->resetStep();
-            $this->isOpen = true;
-        } catch (\Exception $e) {
-            \Log::error('BookingModal openModal error: ' . $e->getMessage());
-            session()->flash('error', 'Unable to open booking form. Please try again.');
-            $this->isOpen = false;
+        if (!$this->selectedItem) {
+            return;
         }
+
+        $this->resetStep();
+        $this->isOpen = true;
     }
 
-    private function loadSelectedItem()
+    private function loadSelectedItem(): void
     {
         if ($this->itemType === 'package') {
             $this->selectedItem = Package::find($this->itemId);
@@ -79,97 +70,80 @@ class BookingModal extends Component
         $this->calculateTotal();
     }
 
-    private function loadAvailableAddons()
+    private function loadAvailableAddons(): void
     {
-        if ($this->business && $this->business->vendor && $this->business->vendor->services) {
-            $this->availableAddons = $this->business->vendor->services->map(function ($service) {
-                return [
-                    'id' => $service->id,
-                    'name' => $service->name,
-                    'price' => (float) $service->price,
-                ];
-            })->toArray();
-        } else {
-            $this->availableAddons = [];
+        if ($this->business?->vendor?->services) {
+            $this->availableAddons = $this->business->vendor->services->map(fn($s) => [
+                'id'    => $s->id,
+                'name'  => $s->name,
+                'price' => (float) $s->price,
+            ])->toArray();
         }
     }
 
-    public function calculateTotal()
+    public function calculateTotal(): void
     {
         $total = $this->selectedItem ? (float) $this->selectedItem->price : 0;
         foreach ($this->selectedAddons as $addonId) {
             $addon = collect($this->availableAddons)->firstWhere('id', $addonId);
-            if ($addon) {
-                $total += $addon['price'];
-            }
+            if ($addon) $total += $addon['price'];
         }
         $this->totalPrice = $total;
     }
 
-    public function updatedSelectedAddons()
+    public function updatedSelectedAddons(): void
     {
         $this->calculateTotal();
     }
 
-    public function nextStep()
+    public function nextStep(): void
     {
-        if ($this->step == 1) {
+        if ($this->step === 1) {
             $this->validate([
-                'name' => 'required|string|min:2',
+                'name'  => 'required|string|min:2',
                 'email' => 'required|email',
             ]);
-        } elseif ($this->step == 2) {
+        } elseif ($this->step === 2) {
             $this->validate([
-                'selectedDate' => 'required|date|after_or_equal:today',
+                'selectedDate'     => 'required|date|after_or_equal:today',
                 'selectedTimeSlot' => 'required|string',
             ]);
         }
         $this->step++;
     }
 
-    public function previousStep()
+    public function previousStep(): void
     {
         $this->step--;
     }
 
-    public function resetStep()
+    public function resetStep(): void
     {
-        $this->step = 1;
-        $this->selectedDate = '';
+        $this->step             = 1;
+        $this->selectedDate     = '';
         $this->selectedTimeSlot = '';
-        $this->selectedAddons = [];
-        $this->totalPrice = 0;
-        if ($this->selectedItem) {
-            $this->calculateTotal();
-        }
+        $this->selectedAddons   = [];
+        $this->totalPrice       = 0;
+        if ($this->selectedItem) $this->calculateTotal();
     }
 
-    public function confirmBooking()
+    public function confirmBooking(): void
     {
         $this->validate([
-            'name' => 'required|string|min:2',
-            'email' => 'required|email',
-            'selectedDate' => 'required|date|after_or_equal:today',
+            'name'             => 'required|string|min:2',
+            'email'            => 'required|email',
+            'selectedDate'     => 'required|date|after_or_equal:today',
             'selectedTimeSlot' => 'required|string',
         ]);
 
-        // Store booking logic here...
-        $this->dispatch('bookingConfirmed', [
-            'item' => $this->selectedItem,
-            'date' => $this->selectedDate,
-            'time' => $this->selectedTimeSlot,
-            'addons' => $this->selectedAddons,
-            'total' => $this->totalPrice,
-            'name' => $this->name,
-            'email' => $this->email,
-        ]);
+        // TODO: save booking to DB here
 
         session()->flash('booking_success', 'Booking request sent successfully!');
         $this->isOpen = false;
         $this->resetStep();
     }
 
-    public function closeModal()
+    public function closeModal(): void
     {
         $this->isOpen = false;
         $this->resetStep();

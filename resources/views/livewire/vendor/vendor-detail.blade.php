@@ -5,7 +5,6 @@
         <!-- ==================== HERO SECTION ==================== -->
         <section
             class="relative min-h-[600px] overflow-hidden bg-gradient-to-br from-white via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-            <!-- Animated blobs (unchanged) -->
             <div
                 class="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-pink-500 via-rose-400 to-pink-300 rounded-full blur-3xl opacity-20 dark:opacity-30 animate-float">
             </div>
@@ -16,7 +15,6 @@
                 class="absolute top-1/3 right-1/3 w-72 h-72 bg-gradient-to-br from-purple-500 via-violet-400 to-purple-300 rounded-full blur-3xl opacity-10 dark:opacity-20 animate-float-delay-2">
             </div>
 
-            <!-- Back button and Featured badge (unchanged) -->
             <div class="relative z-20 container mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex items-center justify-between">
                     <a href="{{ route('wedding-vendors.index') }}"
@@ -41,20 +39,17 @@
                 </div>
             </div>
 
-            <!-- Hero content with enhanced profile card -->
             <div class="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pb-12">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Profile card - enhanced -->
+                    <!-- Profile card -->
                     <div class="lg:col-span-2">
                         <div
                             class="relative group rounded-3xl p-8 lg:p-12 bg-gradient-to-br from-white/90 via-white/70 to-blue-50/70 dark:from-slate-900/80 dark:via-slate-800/70 dark:to-blue-900/60 backdrop-blur-sm border border-pink-400/30 hover:border-pink-500/60 transition-all duration-500 shadow-2xl hover:shadow-pink-500/20">
-                            <!-- Radial gradient overlay for depth -->
                             <div
                                 class="absolute inset-0 rounded-3xl bg-gradient-to-br from-pink-500/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                             </div>
 
                             <div class="relative flex flex-col sm:flex-row items-start gap-8">
-                                <!-- Profile image with animated ring -->
                                 <div class="relative flex-shrink-0 group/image">
                                     <div
                                         class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 opacity-0 group-hover/image:opacity-100 blur-md transition-all duration-500">
@@ -74,7 +69,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Details with improved typography -->
                                 <div class="flex-1">
                                     <h1
                                         class="text-5xl sm:text-6xl font-black text-slate-900 dark:text-white mb-4 bg-gradient-to-r from-pink-600 via-purple-600 to-cyan-600 dark:from-pink-300 dark:via-purple-300 dark:to-cyan-300 bg-clip-text text-transparent animate-gradient-x">
@@ -82,7 +76,6 @@
                                     </h1>
 
                                     <div class="flex flex-wrap gap-3 mb-8">
-                                        <!-- Rating -->
                                         <div
                                             class="glass-light px-4 py-2.5 rounded-xl bg-gradient-to-r from-pink-100/70 to-pink-100/50 dark:from-pink-600/20 dark:to-pink-600/15 border border-pink-300/70 hover:border-pink-400/80 transition-all">
                                             <div
@@ -101,7 +94,6 @@
                                             </div>
                                         </div>
 
-                                        <!-- Location -->
                                         <div
                                             class="glass-light px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-100/70 to-cyan-100/50 dark:from-cyan-600/20 dark:to-cyan-600/15 border border-cyan-300/70 hover:border-cyan-400/80 transition-all">
                                             <div
@@ -128,12 +120,11 @@
                                         @endif
                                     </div>
 
-                                    <!-- Stats Grid with enhanced hover effects -->
                                     <div class="grid grid-cols-3 gap-4">
                                         <div
                                             class="group/stats glass-light hover:bg-gradient-to-br hover:from-cyan-100/70 hover:to-blue-100/60 dark:hover:from-cyan-600/30 dark:hover:to-blue-600/30 rounded-xl p-4 border border-cyan-300/50 hover:border-cyan-500/70 transition-all duration-300 hover:scale-110 hover:-translate-y-2 cursor-default h-28 flex flex-col justify-between">
                                             <div
-                                                class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 dark:from-cyan-600 dark:to-blue-700 rounded-lg flex items-center justify-center mb-2 shadow-lg group-hover/stats:rotate-3 transition-transform duration-300">
+                                                class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center mb-2 shadow-lg group-hover/stats:rotate-3 transition-transform duration-300">
                                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -154,7 +145,7 @@
                                         <div
                                             class="group/stats glass-light hover:bg-gradient-to-br hover:from-amber-100/70 hover:to-orange-100/60 dark:hover:from-amber-600/30 dark:hover:to-orange-600/30 rounded-xl p-4 border border-amber-300/50 hover:border-amber-500/70 transition-all duration-300 hover:scale-110 hover:-translate-y-2 cursor-default h-28 flex flex-col justify-between">
                                             <div
-                                                class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 dark:from-amber-600 dark:to-orange-700 rounded-lg flex items-center justify-center mb-2 shadow-lg group-hover/stats:rotate-3 transition-transform duration-300">
+                                                class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center mb-2 shadow-lg group-hover/stats:rotate-3 transition-transform duration-300">
                                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -173,7 +164,7 @@
                                         <div
                                             class="group/stats glass-light hover:bg-gradient-to-br hover:from-pink-100/70 hover:to-rose-100/60 dark:hover:from-pink-600/30 dark:hover:to-rose-600/30 rounded-xl p-4 border border-pink-300/50 hover:border-pink-500/70 transition-all duration-300 hover:scale-110 hover:-translate-y-2 cursor-default h-28 flex flex-col justify-between">
                                             <div
-                                                class="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-600 dark:from-pink-600 dark:to-rose-700 rounded-lg flex items-center justify-center mb-2 shadow-lg group-hover/stats:rotate-3 transition-transform duration-300">
+                                                class="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg flex items-center justify-center mb-2 shadow-lg group-hover/stats:rotate-3 transition-transform duration-300">
                                                 <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -196,7 +187,7 @@
                         </div>
                     </div>
 
-                    <!-- Price card (unchanged but slightly refined) -->
+                    <!-- Price card -->
                     <div class="lg:col-span-1">
                         <div
                             class="sticky top-20 glass-dark rounded-3xl p-8 bg-gradient-to-br from-pink-100/60 via-purple-100/40 to-cyan-100/60 dark:from-pink-600/20 dark:via-purple-600/15 dark:to-cyan-600/20 border-2 border-pink-400/40 shadow-2xl">
@@ -212,8 +203,7 @@
                                 </div>
                             @else
                                 <div class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white mb-8">On
-                                    Request
-                                </div>
+                                    Request</div>
                             @endif
 
                             <button
@@ -251,13 +241,17 @@
             </div>
         </section>
 
-        <!-- ==================== MAIN CONTENT WITH TABS ==================== -->
+        <!-- ==================== MAIN CONTENT ==================== -->
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 -mt-8 relative z-30">
+
+            {{-- Booking modal lives HERE — outside the grid, at container level --}}
+            <livewire:booking.booking-modal :businessId="$business->id" wire:key="booking-modal-{{ $business->id }}" />
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left column: tabs content -->
+                <!-- Left column: tabs -->
                 <div class="lg:col-span-2 space-y-12">
-                    <!-- Tabs Navigation (unchanged styling, but we keep it) -->
                     <div x-data="{ activeTab: 'about' }" class="w-full">
+                        <!-- Tabs Navigation -->
                         <div
                             class="flex flex-wrap gap-2 border-b-2 border-gray-200 dark:border-gray-700 mb-8 overflow-x-auto">
                             <button @click="activeTab = 'about'"
@@ -328,7 +322,7 @@
                             </button>
                         </div>
 
-                        <!-- Tab: About (unchanged) -->
+                        <!-- Tab: About -->
                         <div x-show="activeTab === 'about'" x-transition.opacity.duration.300ms>
                             <div
                                 class="glass-dark rounded-3xl p-8 lg:p-10 bg-gradient-to-br from-white/70 via-white/50 to-blue-50/60 dark:from-slate-900/70 dark:via-slate-800/60 dark:to-blue-900/50 border-2 border-pink-400/30 shadow-xl">
@@ -336,7 +330,6 @@
                                     class="text-slate-700 dark:text-slate-300 leading-relaxed text-base mb-8 font-medium">
                                     {{ $business->business_desc ?? 'No description available' }}
                                 </p>
-
                                 @if (count($features) > 0)
                                     <div>
                                         <h3
@@ -363,20 +356,18 @@
                             </div>
                         </div>
 
-                        <!-- Tab: Packages (REDESIGNED: smaller cards, nice effects) -->
+                        <!-- Tab: Packages -->
                         <div x-show="activeTab === 'packages'" x-transition.opacity.duration.300ms
                             id="packages-section">
                             @if (count($packages) > 0)
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     @foreach ($packages as $package)
                                         <div class="group relative h-full">
-                                            <!-- Glow effect on hover -->
                                             <div
                                                 class="absolute -inset-0.5 bg-gradient-to-r from-pink-500 via-purple-500 to-cyan-500 rounded-2xl blur-md opacity-0 group-hover:opacity-70 transition duration-500">
                                             </div>
                                             <div
                                                 class="relative glass-dark rounded-2xl p-5 h-full flex flex-col bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 group-hover:border-pink-400/70 transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1">
-                                                <!-- Popular Badge (smaller) -->
                                                 @if ($package['isPopular'])
                                                     <div
                                                         class="absolute top-0 right-0 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 rounded-bl-xl font-black text-[11px] flex items-center gap-1.5 shadow-lg z-10">
@@ -388,7 +379,6 @@
                                                     </div>
                                                 @endif
 
-                                                <!-- Package content -->
                                                 <h3 class="text-lg font-black text-slate-900 dark:text-white mb-1">
                                                     {{ $package['name'] }}
                                                 </h3>
@@ -399,7 +389,6 @@
                                                     </p>
                                                 @endif
 
-                                                <!-- Pricing (smaller) -->
                                                 <div class="mb-4">
                                                     <div class="flex items-baseline gap-1.5 flex-wrap mb-2">
                                                         <span
@@ -423,7 +412,6 @@
                                                     @endif
                                                 </div>
 
-                                                <!-- Features (more compact) -->
                                                 @if (count($package['features']) > 0)
                                                     <div class="mb-4 flex-grow">
                                                         <h4
@@ -450,9 +438,9 @@
                                                     </div>
                                                 @endif
 
-                                                <!-- Book Button (smaller) -->
+                                                {{-- ✅ THE KEY BUTTON — calls openBookingModal on the Livewire component --}}
                                                 <button wire:click="openBookingModal('package', {{ $package['id'] }})"
-                                                    class="w-full group/btn relative overflow-hidden bg-gradient-to-r from-pink-600 via-rose-600 to-pink-600 hover:from-pink-700 hover:via-rose-700 hover:to-pink-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
+                                                    class="w-full group/btn hover:cursor-pointer relative overflow-hidden bg-gradient-to-r from-pink-600 via-rose-600 to-pink-600 hover:from-pink-700 hover:via-rose-700 hover:to-pink-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
                                                     <svg class="w-4 h-4 group-hover/btn:scale-125 transition-transform"
                                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
@@ -468,30 +456,23 @@
                             @else
                                 <div
                                     class="glass-dark rounded-3xl p-12 text-center bg-gradient-to-br from-white/70 to-blue-50/60 dark:from-slate-900/70 dark:to-blue-900/50 border-2 border-pink-400/30">
-                                    <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                    </svg>
                                     <p class="text-gray-600 dark:text-gray-400 font-semibold">No packages available at
                                         the moment.</p>
                                 </div>
                             @endif
                         </div>
 
-                        <!-- Tab: Services (REDESIGNED: smaller cards, nice effects) -->
+                        <!-- Tab: Services -->
                         <div x-show="activeTab === 'services'" x-transition.opacity.duration.300ms>
                             @if (count($services) > 0)
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                                     @foreach ($services as $service)
                                         <div class="group relative h-full">
-                                            <!-- Subtle glow -->
                                             <div
                                                 class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 via-blue-500 to-indigo-500 rounded-2xl blur-md opacity-0 group-hover:opacity-60 transition duration-500">
                                             </div>
                                             <div
                                                 class="relative glass-dark rounded-2xl p-5 h-full flex flex-col bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 group-hover:border-cyan-400/70 transition-all duration-300 shadow-lg hover:shadow-2xl hover:-translate-y-1">
-                                                <!-- Service Image (smaller) -->
                                                 @if ($service['img'])
                                                     <div class="w-full h-32 rounded-xl overflow-hidden mb-3 shadow-md">
                                                         <img src="{{ Storage::url($service['img']) }}"
@@ -499,8 +480,6 @@
                                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                                                     </div>
                                                 @endif
-
-                                                <!-- Service content -->
                                                 <h3 class="text-lg font-black text-slate-900 dark:text-white mb-1">
                                                     {{ $service['name'] }}
                                                 </h3>
@@ -510,8 +489,6 @@
                                                         {{ $service['description'] }}
                                                     </p>
                                                 @endif
-
-                                                <!-- Pricing & Button -->
                                                 <div
                                                     class="mt-auto pt-3 border-t border-gray-200 dark:border-gray-700">
                                                     <div
@@ -520,7 +497,7 @@
                                                     </div>
                                                     <button
                                                         wire:click="openBookingModal('service', {{ $service['id'] }})"
-                                                        class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
+                                                        class="w-full hover:cursor-pointer bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                             viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -537,18 +514,13 @@
                             @else
                                 <div
                                     class="glass-dark rounded-3xl p-12 text-center bg-gradient-to-br from-white/70 to-cyan-50/60 dark:from-slate-900/70 dark:to-blue-900/50 border-2 border-cyan-400/30">
-                                    <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                    </svg>
                                     <p class="text-gray-600 dark:text-gray-400 font-semibold">No additional services
                                         listed.</p>
                                 </div>
                             @endif
                         </div>
 
-                        <!-- Tab: FAQs (unchanged) -->
+                        <!-- Tab: FAQs -->
                         <div x-show="activeTab === 'faqs'" x-transition.opacity.duration.300ms>
                             @if (count($faqs) > 0)
                                 <div class="space-y-4">
@@ -577,21 +549,15 @@
                             @else
                                 <div
                                     class="glass-dark rounded-3xl p-12 text-center bg-gradient-to-br from-white/70 to-blue-50/60 dark:from-slate-900/70 dark:to-blue-900/50 border-2 border-pink-400/30">
-                                    <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
                                     <p class="text-gray-600 dark:text-gray-400 font-semibold">No FAQs available.</p>
                                 </div>
                             @endif
                         </div>
 
-                        <!-- Tab: Reviews (unchanged) -->
+                        <!-- Tab: Reviews -->
                         <div x-show="activeTab === 'reviews'" x-transition.opacity.duration.300ms>
                             @if ($reviewsCount > 0)
                                 <div>
-                                    <!-- Rating Overview -->
                                     <div
                                         class="glass-dark rounded-3xl p-8 bg-gradient-to-br from-white/70 via-white/50 to-blue-50/60 dark:from-slate-900/70 dark:via-slate-800/60 dark:to-blue-900/50 border-2 border-pink-400/30 mb-8 shadow-xl">
                                         <div class="flex items-center gap-6 mb-8">
@@ -608,13 +574,13 @@
                                                         </svg>
                                                     @endfor
                                                 </div>
-                                                <p class="text-sm text-gray-600 dark:text-gray-400 font-semibold">Based
-                                                    on <strong>{{ $reviewsCount }}</strong> verified reviews</p>
+                                                <p class="text-sm text-gray-600 dark:text-gray-400 font-semibold">
+                                                    Based on <strong>{{ $reviewsCount }}</strong> verified reviews
+                                                </p>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Reviews List -->
                                     <div class="space-y-6">
                                         @foreach ($reviews as $review)
                                             <div
@@ -633,8 +599,9 @@
                                                         <div class="flex items-center justify-between mb-2">
                                                             <p class="font-black text-slate-900 dark:text-white">
                                                                 {{ $review['reviewerName'] }}</p>
-                                                            <span
-                                                                class="text-xs text-gray-500 dark:text-gray-400">{{ $review['createdAt']->diffForHumans() }}</span>
+                                                            <span class="text-xs text-gray-500 dark:text-gray-400">
+                                                                {{ $review['createdAt']->diffForHumans() }}
+                                                            </span>
                                                         </div>
                                                         <div class="flex gap-1">
                                                             @for ($i = 1; $i <= 5; $i++)
@@ -653,35 +620,17 @@
                                             </div>
                                         @endforeach
                                     </div>
-
-                                    @if ($reviewsCount > 5)
-                                        <div class="mt-8 text-center">
-                                            <button
-                                                class="text-pink-600 dark:text-pink-400 font-black hover:underline transition-all">
-                                                Load more reviews →
-                                            </button>
-                                        </div>
-                                    @endif
                                 </div>
                             @else
                                 <div
                                     class="glass-dark rounded-3xl p-12 text-center bg-gradient-to-br from-white/70 to-blue-50/60 dark:from-slate-900/70 dark:to-blue-900/50 border-2 border-pink-400/30">
-                                    <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                                    </svg>
                                     <p class="text-gray-600 dark:text-gray-400 font-semibold mb-4">No reviews yet. Be
-                                        the first to share your experience!</p>
-                                    <button
-                                        class="bg-gradient-to-r from-pink-600 to-rose-600 text-white font-black py-3 px-6 rounded-xl hover:scale-105 transition-all">
-                                        Write a Review
-                                    </button>
+                                        the first!</p>
                                 </div>
                             @endif
                         </div>
 
-                        <!-- Tab: Gallery (unchanged) -->
+                        <!-- Tab: Gallery -->
                         <div x-show="activeTab === 'gallery'" x-transition.opacity.duration.300ms>
                             @if (count($portfolioImages) > 0)
                                 <div
@@ -715,11 +664,6 @@
                             @else
                                 <div
                                     class="glass-dark rounded-3xl p-12 text-center bg-gradient-to-br from-white/70 to-blue-50/60 dark:from-slate-900/70 dark:to-blue-900/50 border-2 border-pink-400/30">
-                                    <svg class="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4"
-                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
                                     <p class="text-gray-600 dark:text-gray-400 font-semibold">No gallery images
                                         available.</p>
                                 </div>
@@ -728,10 +672,9 @@
                     </div>
                 </div>
 
-                <!-- Right column: Contact Card (unchanged) -->
+                <!-- Right column: Contact Card -->
                 <div class="lg:col-span-1">
                     <div class="sticky top-20 space-y-6">
-                        <!-- Contact Card -->
                         <div
                             class="glass-dark rounded-3xl p-8 bg-gradient-to-br from-pink-100/60 via-purple-100/40 to-cyan-100/60 dark:from-pink-600/25 dark:via-purple-600/20 dark:to-cyan-600/25 border-2 border-pink-400/40 shadow-2xl">
                             <h3
@@ -833,7 +776,7 @@
                                                 class="w-11 h-11 glass-light hover:bg-cyan-100/60 dark:hover:bg-cyan-600/50 rounded-lg flex items-center justify-center text-cyan-600 dark:text-cyan-400 hover:scale-125 transition-all border-2 border-cyan-300/60">
                                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                                     <path
-                                                        d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417a9.867 9.867 0 01-6.102 2.104c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                                                        d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.104c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
                                                 </svg>
                                             </a>
                                         @endif
@@ -843,10 +786,9 @@
                         </div>
                     </div>
                 </div>
-
             </div>
-            <!-- CTA Section (unchanged) -->
-            <livewire:booking.booking-modal :businessId="$business->id" wire:key="booking-modal-{{ $business->id }}" />
+
+            <!-- CTA Section -->
             <div
                 class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-pink-600 via-purple-600 to-cyan-600 dark:from-pink-700 dark:via-purple-700 dark:to-cyan-700 p-12 lg:p-20 mt-16 text-center shadow-2xl">
                 <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/20 rounded-full blur-3xl animate-float">
@@ -854,7 +796,6 @@
                 <div
                     class="absolute -bottom-40 -left-40 w-80 h-80 bg-white/15 rounded-full blur-3xl animate-float-delay-1">
                 </div>
-
                 <div class="relative z-10">
                     <h2 class="text-4xl lg:text-5xl font-black text-white mb-5">Ready to Collaborate?</h2>
                     <p class="text-lg lg:text-xl text-white/95 mb-10 font-semibold max-w-2xl mx-auto">
@@ -883,7 +824,6 @@
             </div>
         </div>
     @else
-        <!-- Not Found (unchanged) -->
         <div class="min-h-screen flex items-center justify-center py-12 px-4">
             <div class="text-center max-w-md">
                 <div
@@ -907,7 +847,6 @@
 
 @push('styles')
     <style>
-        /* Keyframes and utility classes remain the same */
         @keyframes float-subtle {
 
             0%,
@@ -917,18 +856,6 @@
 
             50% {
                 transform: translateY(-16px);
-            }
-        }
-
-        @keyframes pulse-ring {
-
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7);
-            }
-
-            50% {
-                box-shadow: 0 0 0 10px rgba(236, 72, 153, 0);
             }
         }
 
@@ -944,22 +871,6 @@
         .animate-float-delay-2 {
             animation: float-subtle 12s ease-in-out infinite;
             animation-delay: 2s;
-        }
-
-        .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
         }
 
         .glass-dark {
@@ -985,13 +896,6 @@
         .line-clamp-2 {
             display: -webkit-box;
             -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .line-clamp-3 {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
