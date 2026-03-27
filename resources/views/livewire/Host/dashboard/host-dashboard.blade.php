@@ -1,9 +1,5 @@
 <div class="space-y-6">
-    {{-- Welcome header --}}
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 sm:mt-0">{{ now()->format('l, F j, Y') }}</p>
-    </div>
+
 
     {{-- Stats Grid --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
