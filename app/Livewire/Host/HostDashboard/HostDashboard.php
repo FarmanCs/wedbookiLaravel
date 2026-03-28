@@ -17,6 +17,12 @@ use Carbon\Carbon;
 class HostDashboard extends Component
 {
     public $host;
+    public array $vendorCategories = [];
+    public array $expenseBreakdown = [];
+    public array $checklistTasks = [];
+    public int $doneTasks = 0;
+    public int $totalTasks = 0;
+    public int $overdueTasks = 0;
 
     // Filter & Search
     public string $vendorSearch = '';
@@ -42,9 +48,160 @@ class HostDashboard extends Component
     public int $perPage = 6;
     public int $currentPage = 1;
 
+    // Wedding date and countdown
+    public $weddingDate;
+    public array $countdown = ['days' => 0, 'hours' => 0, 'minutes' => 0, 'seconds' => 0];
+    public bool $showDateModal = false;
+
+    /**
+     * Open the date picker modal
+     */
+    public function openDateModal()
+    {
+        $this->showDateModal = true;
+    }
+
+    /**
+     * Close the date picker modal
+     */
+    public function closeDateModal()
+    {
+        $this->showDateModal = false;
+    }
+
+    /**
+     * Set the wedding date
+     */
+    public function setWeddingDate($date)
+    {
+        // Validate that the date is not in the past
+        $selectedDate = Carbon::parse($date)->startOfDay();
+        $today = Carbon::now()->startOfDay();
+
+        if ($selectedDate < $today) {
+            $this->dispatch('error', message: 'Please select a date that is today or in the future.');
+            return;
+        }
+
+        $this->host->wedding_date = $date;
+        $this->host->save();
+        $this->weddingDate = $date;
+        $this->updateCountdown();
+        $this->showDateModal = false;
+        $this->dispatch('date-set');
+        $this->dispatch('success', message: 'Wedding date has been updated successfully!');
+    }
+
+    /**
+     * Update the countdown timer
+     */
+    public function updateCountdown()
+    {
+        if (!$this->weddingDate) {
+            $this->countdown = ['days' => 0, 'hours' => 0, 'minutes' => 0, 'seconds' => 0];
+            return;
+        }
+
+        $now = Carbon::now();
+        $eventDate = Carbon::parse($this->weddingDate);
+
+        if ($eventDate < $now) {
+            $this->countdown = ['days' => 0, 'hours' => 0, 'minutes' => 0, 'seconds' => 0];
+        } else {
+            $diff = $now->diff($eventDate);
+            $this->countdown = [
+                'days' => $diff->days,
+                'hours' => $diff->h,
+                'minutes' => $diff->i,
+                'seconds' => $diff->s,
+            ];
+        }
+    }
+
+    /**
+     * Load vendor categories
+     */
+    private function loadVendorCategories(): void
+    {
+        // Static list of all categories
+        $allCategories = [
+            'Cakes And Bakes',
+            'Catering',
+            'Décor',
+            'Entertainment',
+            'Event Planning',
+            'Flowers',
+            'Hairstylist',
+            'Henna Artists',
+            'Jewelry & Accessories',
+            'Makeup Artists',
+            'Marquee',
+            'Music',
+            'Photography And Videography',
+            'Venue',
+            'Wedding Attire'
+        ];
+
+        // Count hired categories based on bookings
+        $hiredCategories = Booking::where('host_id', $this->host->id)
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->with('business.category')
+            ->get()
+            ->pluck('business.category.name')
+            ->unique()
+            ->filter()
+            ->toArray();
+
+        $this->vendorCategories = [
+            'all' => $allCategories,
+            'hired' => $hiredCategories,
+            'hiredCount' => count($hiredCategories),
+            'totalCount' => count($allCategories)
+        ];
+    }
+
+    /**
+     * Load expense breakdown
+     */
+    private function loadExpenseBreakdown(): void
+    {
+        $bookings = Booking::where('host_id', $this->host->id)
+            ->whereIn('status', ['confirmed', 'completed'])
+            ->with('business.category')
+            ->get();
+
+        $breakdown = [];
+        foreach ($bookings as $booking) {
+            $cat = $booking->business->category->name ?? 'Uncategorized';
+            $breakdown[$cat] = ($breakdown[$cat] ?? 0) + ($booking->amount ?? 0);
+        }
+        $this->expenseBreakdown = $breakdown;
+    }
+
+    /**
+     * Load checklist tasks
+     */
+    private function loadChecklistTasks(): void
+    {
+        // Placeholder tasks – replace with actual checklist data
+        $this->checklistTasks = [
+            ['title' => 'Process Advance Payment', 'due' => 'November 26', 'type' => 'Payment', 'description' => 'Pay your advance of 250 by 26 Nov 2025 to confirm your booking.'],
+            ['title' => 'Pay Final Payment', 'due' => 'December 17', 'type' => 'Payment', 'description' => 'Complete your remaining payment of 2250 by 17 Dec 2025 to keep your booking confirmed.'],
+            ['title' => 'Confirm Menu with Caterer', 'due' => 'December 10', 'type' => 'Vendor', 'description' => 'Finalize the menu selections for the wedding reception.'],
+        ];
+        $this->doneTasks = 2; // from DB count
+        $this->totalTasks = 61; // from DB count
+        $this->overdueTasks = 52; // from DB count
+    }
+
+    /**
+     * Mount the component
+     */
     public function mount(): void
     {
         $this->host = Auth::guard('host')->user();
+        $this->weddingDate = $this->host->wedding_date;
+        $this->updateCountdown();
         $this->loadDashboardData();
     }
 
@@ -61,6 +218,9 @@ class HostDashboard extends Component
         $this->loadGuestGroups();
         $this->loadRecentActivity();
         $this->loadPackages();
+        $this->loadVendorCategories();
+        $this->loadExpenseBreakdown();
+        $this->loadChecklistTasks();
     }
 
     /**
@@ -339,6 +499,7 @@ class HostDashboard extends Component
     public function refresh(): void
     {
         $this->loadDashboardData();
+        $this->updateCountdown();
         $this->dispatch('notification', message: 'Dashboard refreshed successfully!');
     }
 

@@ -78,7 +78,7 @@ Route::prefix('host')->name('host.')->group(function () {
 
         /* Dashboard */
         Route::get('/dashboard', HostDashboard::class)
-            ->name('host-dashboard');
+            ->name('dashboard');
 
         /* Vendors */
         Route::prefix('vendors')->name('vendors.')->group(function () {
@@ -106,6 +106,12 @@ Route::prefix('host')->name('host.')->group(function () {
             Route::get('/', \App\Livewire\Host\Checklists\Personalized::class)->name('index');
             Route::get('/personalized', \App\Livewire\Host\Checklists\Personalized::class)->name('personalized');
         });
+
+        // Messages
+        Route::get('/messages', \App\Livewire\Host\Messages\Index::class)->name('messages');
+
+        // Budget
+        Route::get('/budget', \App\Livewire\Host\Budget\Index::class)->name('budget');
 
         /* Logout */
         Route::post('/logout', function () {

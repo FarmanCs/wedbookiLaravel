@@ -11,6 +11,7 @@ use Livewire\Component;
 class WeddingVendors extends Component
 {
     public Collection $categories;
+    public $search = '';
 
     public function mount()
     {
@@ -109,7 +110,9 @@ class WeddingVendors extends Component
     public function render()
     {
         $groupedBusinesses = $this->categories->mapWithKeys(function ($category) {
-            $businesses = $category->businesses->map(function ($business) {
+            $businesses = $category->businesses->filter(function ($business) {
+                return empty($this->search) || str_contains(strtolower($business->company_name), strtolower($this->search));
+            })->map(function ($business) {
                 $business->avg_rating = $this->averageRating($business);
                 $business->reviews_count = $this->reviewsCount($business);
                 $business->starting_price = $this->startingPrice($business);

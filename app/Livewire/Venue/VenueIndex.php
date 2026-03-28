@@ -85,7 +85,9 @@ class VenueIndex extends Component
 
     public function updatedSearch()
     {
-        $this->resetPage();
+        if (strlen($this->search) >= 3 || empty($this->search)) {
+            $this->resetPage();
+        }
     }
 
     public function updatedCountry()

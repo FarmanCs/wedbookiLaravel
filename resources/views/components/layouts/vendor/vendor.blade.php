@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full" x-data="{
     darkMode: localStorage.getItem('darkMode') === 'true' ? true : false,
-    toggleDark() { this.darkMode = !this.darkMode;
-        localStorage.setItem('darkMode', this.darkMode); },
+    toggleDark() {
+        this.darkMode = !this.darkMode;
+        localStorage.setItem('darkMode', this.darkMode);
+    },
     init() { if (this.darkMode) document.documentElement.classList.add('dark'); }
 }" x-init="init();
 $watch('darkMode', val => document.documentElement.classList.toggle('dark', val))">
@@ -33,9 +35,9 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
                         </div>
                         <div class="hidden md:flex space-x-6">
                             <a href="{{ route('wedding-venues.index') }}"
-                                                class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-medium">
-                                             VENUES
-                                                        </a>
+                                class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-medium">
+                                VENUES
+                            </a>
                             <a href="{{ route('wedding-vendors.index') }}"
                                 class="text-gray-700 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-medium">VENDORS</a>
                             <a href="{{ route('wedding-planner') }}"
@@ -50,7 +52,7 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
                         <div class="relative hidden md:block">
                             <x-heroicon-s-magnifying-glass
                                 class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                            <input type="text" placeholder="Try 'Four Seasons' in Venues"
+                            <input type="text" placeholder="Search Vendors" wire:model.debounce.500ms="search"
                                 class="pl-9 pr-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:ring-primary-500 focus:border-primary-500 w-64">
                         </div>
                         <!-- Currency -->
@@ -73,30 +75,30 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
         <!-- Sub-navigation (Dashboard, Calendar, Messages, etc.) -->
         <div class="dark:bg-stone-800  dark:border-gray-700 mb-2">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-               <div class="flex space-x-6 overflow-x-auto py-3 text-sm font-medium">
-    <a href="{{ route('vendor.dashboard') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.dashboard') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Dashboard</a>
-    <a href="{{ route('vendor.calendar') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.calendar') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Calendar</a>
-    <a href="{{ route('vendor.messages') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.messages') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Messages</a>
-    <a href="{{ route('vendor.storefront') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.storefront') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Storefront</a>
-    <a href="{{ route('vendor.payments') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.payments') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Payments</a>
-    <a href="{{ route('vendor.reviews') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.reviews') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Reviews</a>
-    <a href="{{ route('vendor.bookings') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.bookings') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Bookings</a>
-    <!-- FIXED: Changed from route('vendor.business') to route('vendor.business.index') -->
-    <a href="{{ route('vendor.business.index') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.business*') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Business</a>
-    <!-- New Packages link -->
-    <a href="{{ route('vendor.packages') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.packages') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Packages</a>
-    <a href="{{ route('vendor.analytics') }}"
-        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.analytics') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Analytics</a>
-</div>
+                <div class="flex space-x-6 overflow-x-auto py-3 text-sm font-medium">
+                    <a href="{{ route('vendor.dashboard') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.dashboard') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Dashboard</a>
+                    <a href="{{ route('vendor.calendar') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.calendar') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Calendar</a>
+                    <a href="{{ route('vendor.messages') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.messages') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Messages</a>
+                    <a href="{{ route('vendor.storefront') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.storefront') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Storefront</a>
+                    <a href="{{ route('vendor.payments') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.payments') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Payments</a>
+                    <a href="{{ route('vendor.reviews') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.reviews') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Reviews</a>
+                    <a href="{{ route('vendor.bookings') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.bookings') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Bookings</a>
+                    <!-- FIXED: Changed from route('vendor.business') to route('vendor.business.index') -->
+                    <a href="{{ route('vendor.business.index') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.business*') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Business</a>
+                    <!-- New Packages link -->
+                    <a href="{{ route('vendor.packages') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.packages') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Packages</a>
+                    <a href="{{ route('vendor.analytics') }}"
+                        class="whitespace-nowrap px-1 py-2 {{ request()->routeIs('vendor.analytics') ? 'text-primary-600 border-b-2 border-primary-600 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400' }}">Analytics</a>
+                </div>
             </div>
         </div>
 

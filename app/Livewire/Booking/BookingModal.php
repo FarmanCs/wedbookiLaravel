@@ -75,12 +75,7 @@ class BookingModal extends Component
 
     public function confirmBooking()
     {
-        // if (!Auth::check()) {
 
-        //     session()->flash('error', 'Please login first.');
-
-        //     return redirect()->route('hostlogin');
-        // }
         [$start, $end] = explode(' - ', $this->selectedTimeSlot);
         // dd(Auth::guard('host')->id());
         Booking::create([
