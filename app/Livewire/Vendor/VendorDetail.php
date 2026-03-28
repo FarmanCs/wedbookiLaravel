@@ -127,10 +127,10 @@ class VendorDetail extends Component
         return $stars;
     }
 
+    // ✅ FIXED: Use dispatch() to send globally - no to() method
     public function openBookingModal($type, $id): void
     {
-        $this->dispatch('openBookingModal', type: $type, id: $id)
-            ->to(\App\Livewire\Booking\BookingModal::class);
+        $this->dispatch('bookingModalOpen', type: $type, id: $id);
     }
 
     public function render()

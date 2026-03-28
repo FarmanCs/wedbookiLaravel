@@ -146,7 +146,7 @@ class Index extends Component
 
     protected function formatBooking($booking)
     {
-        
+
         return [
             'id' => $booking->id,
             'custom_id' => $booking->custom_booking_id ?? '#B' . str_pad($booking->id, 5, '0', STR_PAD_LEFT),
@@ -190,7 +190,7 @@ class Index extends Component
         if ($this->searchQuery) {
             $query->where(function ($q) {
                 $q->where('custom_booking_id', 'like', '%' . $this->searchQuery . '%')
-                  ->orWhereHas('host', fn($q) => $q->where('full_name', 'like', '%' . $this->searchQuery . '%'));
+                    ->orWhereHas('host', fn($q) => $q->where('full_name', 'like', '%' . $this->searchQuery . '%'));
             });
         }
 

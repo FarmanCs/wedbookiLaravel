@@ -244,9 +244,9 @@
         <!-- ==================== MAIN CONTENT ==================== -->
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16 -mt-8 relative z-30">
 
-            {{-- Booking modal lives HERE — outside the grid, at container level --}}
-            <livewire:booking.booking-modal :businessId="$business->id" wire:key="booking-modal-{{ $business->id }}" />
 
+            {{-- <livewire:booking.booking-modal :businessId="$business->id" wire:key="booking-modal-{{ $business->id }}" /> --}}
+            <livewire:booking.booking-modal />
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Left column: tabs -->
                 <div class="lg:col-span-2 space-y-12">
@@ -438,7 +438,7 @@
                                                     </div>
                                                 @endif
 
-                                                {{-- ✅ THE KEY BUTTON — calls openBookingModal on the Livewire component --}}
+
                                                 <button wire:click="openBookingModal('package', {{ $package['id'] }})"
                                                     class="w-full group/btn hover:cursor-pointer relative overflow-hidden bg-gradient-to-r from-pink-600 via-rose-600 to-pink-600 hover:from-pink-700 hover:via-rose-700 hover:to-pink-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
                                                     <svg class="w-4 h-4 group-hover/btn:scale-125 transition-transform"
@@ -449,6 +449,16 @@
                                                     </svg>
                                                     Book Now
                                                 </button>
+                                                {{-- <button wire:click="openBookingModal"
+                                                    class="w-full group/btn hover:cursor-pointer relative overflow-hidden bg-gradient-to-r from-pink-600 via-rose-600 to-pink-600 hover:from-pink-700 hover:via-rose-700 hover:to-pink-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-md text-sm">
+                                                    <svg class="w-4 h-4 group-hover/btn:scale-125 transition-transform"
+                                                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2.5"
+                                                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                                    </svg>
+                                                    Book Now
+                                                </button> --}}
                                             </div>
                                         </div>
                                     @endforeach
@@ -900,8 +910,4 @@
             overflow: hidden;
         }
     </style>
-@endpush
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 @endpush

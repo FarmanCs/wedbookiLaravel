@@ -13,13 +13,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Booking extends Model
 {
     use HasFactory, SoftDeletes;
-
+    protected $guarded = ['custom_booking_id'];
     protected $fillable = [
         'host_id',
         'business_id',
         'vendor_id',
         'package_id',
-        'custom_booking_id',
         'amount',
         'advance_percentage',
         'advance_amount',
@@ -59,6 +58,19 @@ class Booking extends Model
         'final_amount' => 'decimal:2',
         'extra_services' => 'json',
     ];
+
+    protected static function booted()
+    {
+        static::creating(function ($booking) {
+
+            // Generate next booking number
+            $nextId = self::withTrashed()->max('id') + 1;
+
+            $booking->custom_booking_id =
+                'WBK-' . date('Y') . '-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
+        });
+    }
+
 
     // Relationships
     public function host()

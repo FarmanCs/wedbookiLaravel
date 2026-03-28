@@ -44,12 +44,24 @@
                     scroll(direction) {
                         const container = this.$refs.container;
                         if (!container) return;
-                        const cardWidth = container.querySelector('.snap-start')?.offsetWidth || 288;
+                        // Get the width of the first card (default to 288px if none exist)
+                        const firstCard = container.querySelector('.snap-start');
+                        const cardWidth = firstCard ? firstCard.offsetWidth : 288;
                         const gap = 20; // matches space-x-5
                         const scrollAmount = cardWidth + gap;
                         container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-                        // Update scroll state after animation
-                        setTimeout(() => this.updateScrollState(), 300);
+                
+                        // Wait for the smooth scroll to finish and then update the button states
+                        const onScrollEnd = () => {
+                            this.updateScrollState();
+                            container.removeEventListener('scrollend', onScrollEnd);
+                        };
+                        container.addEventListener('scrollend', onScrollEnd, { once: true });
+                        // Fallback in case scrollend is not supported
+                        setTimeout(() => {
+                            this.updateScrollState();
+                            container.removeEventListener('scrollend', onScrollEnd);
+                        }, 300);
                     }
                 }">
 
@@ -73,9 +85,10 @@
                         </svg>
                     </button>
 
-                    <!-- Scrollable Cards (scrollbar hidden) -->
+                    <!-- Scrollable Cards – manual scrolling disabled, scrollbar hidden -->
                     <div x-ref="container" @scroll="updateScrollState"
-                        class="flex overflow-x-hide space-x-5 pb-6 scrollbar-hide scroll-smooth snap-x snap-mandatory">
+                        class="flex overflow-x-hidden space-x-5 pb-6 scrollbar-hide scroll-smooth snap-x snap-mandatory"
+                        style="scrollbar-width: none; -webkit-overflow-scrolling: touch;">
                         @foreach ($businesses as $business)
                             <a href="{{ $business->detail_url }}"
                                 class="flex-none w-72 snap-start group/card hover:no-underline">
@@ -196,10 +209,9 @@
                                                     @endif
                                                 </div>
                                             </div>
-                                            <!-- Button -->
                                             <button
-                                                class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 dark:from-amber-600 dark:to-orange-600 dark:hover:from-amber-700 dark:hover:to-orange-700 text-white font-bold py-2 px-3 rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2 whitespace-nowrap text-sm"
-                                                onclick="event.preventDefault(); event.stopPropagation(); Livewire.navigate('{{ $business->detail_url }}')">
+                                                onclick="event.preventDefault(); event.stopPropagation(); Livewire.navigate('{{ $business->detail_url }}')"
+                                                class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 dark:from-amber-600 dark:to-orange-600 dark:hover:from-amber-700 dark:hover:to-orange-700 text-white font-bold py-2 px-3 rounded-lg transition-all duration-300 hover:shadow-lg hover:scale-105 active:scale-95 flex items-center gap-2 whitespace-nowrap text-sm">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                     viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -227,7 +239,5 @@
             </div>
         @endforelse
     </div>
-    @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    @endpush
+
 </div>

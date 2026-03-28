@@ -72,7 +72,44 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
             </div>
         </nav>
 
+        <!-- Host Dashboard Navigation -->
+        <div class="dark:bg-stone-800 mb-2">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex space-x-6 overflow-x-auto py-3 text-sm font-medium">
 
+                    <a href="{{ route('host.host-dashboard') }}"
+                        class="{{ request()->routeIs('host.dashboard') ? 'active-tab' : 'tab' }}">
+                        Dashboard
+                    </a>
+
+                    <a href="{{ route('host.vendors.index') }}"
+                        class="{{ request()->routeIs('host.vendors*') ? 'active-tab' : 'tab' }}">
+                        Vendors
+                    </a>
+
+                    <a href="{{ route('host.venues.index') }}"
+                        class="{{ request()->routeIs('host.venues*') ? 'active-tab' : 'tab' }}">
+                        Venues
+                    </a>
+
+                    <a href="{{ route('host.bookings.index') }}"
+                        class="{{ request()->routeIs('host.bookings*') ? 'active-tab' : 'tab' }}">
+                        Bookings
+                    </a>
+
+                    <a href="{{ route('host.guests.index') }}"
+                        class="{{ request()->routeIs('host.guests*') ? 'active-tab' : 'tab' }}">
+                        Guests
+                    </a>
+
+                    <a href="{{ route('host.checklists.index') }}"
+                        class="{{ request()->routeIs('host.checklists*') ? 'active-tab' : 'tab' }}">
+                        Checklist
+                    </a>
+
+                </div>
+            </div>
+        </div>
 
         <!-- Main Content -->
         <main class="flex-1">
@@ -148,7 +185,8 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
                                     class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Checklist</a></li>
                             <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Guest
                                     list</a></li>
-                            <li><a href="#" class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Vendor
+                            <li><a href="#"
+                                    class="text-gray-600 dark:text-gray-400 hover:text-primary-600">Vendor
                                     manager</a>
                             </li>
                         </ul>

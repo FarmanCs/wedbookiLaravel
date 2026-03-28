@@ -3,150 +3,105 @@
 namespace App\Livewire\Booking;
 
 use Livewire\Component;
-use Livewire\Attributes\On;
-use App\Models\Business\Business;
+use App\Models\Booking\Booking;
 use App\Models\Business\Package;
 use App\Models\Business\Service;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 
 class BookingModal extends Component
 {
-    public $businessId;
+    public bool $isOpen = false;
+
     public $itemType;
     public $itemId;
-    public bool $isOpen = false;
+    public $selectedItem;
+
     public int $step = 1;
 
-    public string $name  = '';
+    public string $name = '';
     public string $email = '';
-    public string $selectedDate     = '';
-    public string $selectedTimeSlot = '';
-    public array  $selectedAddons   = [];
-    public float  $totalPrice       = 0;
 
-    public $business;
-    public $selectedItem;
+    public string $selectedDate = '';
+    public string $selectedTimeSlot = '';
+
+    public array $selectedAddons = [];
     public array $availableAddons = [];
 
-    public function mount($businessId = null)
+    public float $totalPrice = 0;
+
+
+    #[On('bookingModalOpen')]
+    public function openBookingModal($type, $id)
     {
-        $this->businessId = $businessId;
+        $this->resetExcept('availableAddons');
 
-        if ($businessId) {
-            $this->business = Business::find($businessId);
-            $this->loadAvailableAddons();
-        }
-
-        if (Auth::check()) {
-            $user        = Auth::user();
-            $this->name  = $user->full_name ?? '';
-            $this->email = $user->email ?? '';
-        }
-    }
-
-    #[On('openBookingModal')]
-    public function openModal(string $type, int $id): void
-    {
         $this->itemType = $type;
         $this->itemId   = $id;
 
-        $this->loadSelectedItem();
-
-        if (!$this->selectedItem) {
-            return;
+        if ($type === 'package') {
+            $this->selectedItem = Package::findOrFail($id);
+        } elseif ($type === 'service') {
+            $this->selectedItem = Service::findOrFail($id);
         }
 
-        $this->resetStep();
-        $this->isOpen = true;
-    }
+        if (!$this->selectedItem) return;
 
-    private function loadSelectedItem(): void
-    {
-        if ($this->itemType === 'package') {
-            $this->selectedItem = Package::find($this->itemId);
-        } elseif ($this->itemType === 'service') {
-            $this->selectedItem = Service::find($this->itemId);
+        $this->totalPrice = (float) $this->selectedItem->price;
+
+        if (Auth::check()) {
+            $this->name  = Auth::user()->full_name ?? '';
+            $this->email = Auth::user()->email ?? '';
         }
-        $this->calculateTotal();
+
+        $this->step = 1;
+        $this->isOpen = true; // 🔥 MODAL OPENS HERE
     }
 
-    private function loadAvailableAddons(): void
+    public function closeModal()
     {
-        if ($this->business?->vendor?->services) {
-            $this->availableAddons = $this->business->vendor->services->map(fn($s) => [
-                'id'    => $s->id,
-                'name'  => $s->name,
-                'price' => (float) $s->price,
-            ])->toArray();
-        }
+        $this->isOpen = false;
     }
 
-    public function calculateTotal(): void
+    public function nextStep()
     {
-        $total = $this->selectedItem ? (float) $this->selectedItem->price : 0;
-        foreach ($this->selectedAddons as $addonId) {
-            $addon = collect($this->availableAddons)->firstWhere('id', $addonId);
-            if ($addon) $total += $addon['price'];
-        }
-        $this->totalPrice = $total;
-    }
-
-    public function updatedSelectedAddons(): void
-    {
-        $this->calculateTotal();
-    }
-
-    public function nextStep(): void
-    {
-        if ($this->step === 1) {
-            $this->validate([
-                'name'  => 'required|string|min:2',
-                'email' => 'required|email',
-            ]);
-        } elseif ($this->step === 2) {
-            $this->validate([
-                'selectedDate'     => 'required|date|after_or_equal:today',
-                'selectedTimeSlot' => 'required|string',
-            ]);
-        }
         $this->step++;
     }
 
-    public function previousStep(): void
+    public function previousStep()
     {
         $this->step--;
     }
 
-    public function resetStep(): void
+    public function confirmBooking()
     {
-        $this->step             = 1;
-        $this->selectedDate     = '';
-        $this->selectedTimeSlot = '';
-        $this->selectedAddons   = [];
-        $this->totalPrice       = 0;
-        if ($this->selectedItem) $this->calculateTotal();
-    }
+        // if (!Auth::check()) {
 
-    public function confirmBooking(): void
-    {
-        $this->validate([
-            'name'             => 'required|string|min:2',
-            'email'            => 'required|email',
-            'selectedDate'     => 'required|date|after_or_equal:today',
-            'selectedTimeSlot' => 'required|string',
+        //     session()->flash('error', 'Please login first.');
+
+        //     return redirect()->route('hostlogin');
+        // }
+        [$start, $end] = explode(' - ', $this->selectedTimeSlot);
+        // dd(Auth::guard('host')->id());
+        Booking::create([
+            'host_id'     => Auth::guard('host')->id(),
+            'business_id' => $this->selectedItem->business_id,
+            'vendor_id'   => $this->selectedItem->business->vendor_id,
+
+            'package_id'  => $this->itemType === 'package' ? $this->itemId : null,
+            'service_id'  => $this->itemType === 'service' ? $this->itemId : null,
+
+            'event_date'  => $this->selectedDate,
+            'start_time'  => date('H:i:s', strtotime($start)),
+            'end_time'    => date('H:i:s', strtotime($end)),
+
+            'amount'      => $this->totalPrice,
+            'status'      => 'pending',
         ]);
 
-        // TODO: save booking to DB here
-
         session()->flash('booking_success', 'Booking request sent successfully!');
-        $this->isOpen = false;
-        $this->resetStep();
-    }
 
-    public function closeModal(): void
-    {
-        $this->isOpen = false;
-        $this->resetStep();
+        $this->closeModal();
     }
 
     public function render()
