@@ -13,17 +13,25 @@ return new class extends Migration
 
             $table->foreignId('business_id')
                 ->constrained('businesses')
-                ->onDelete('cascade');
+                ->cascadeOnDelete();
 
             $table->foreignId('plan_id')
                 ->constrained('plans')
-                ->onDelete('cascade');
+                ->cascadeOnDelete();
 
-            $table->timestamp('tran_time')->useCurrent();
-            $table->string('from')->nullable();
-            $table->string('to')->nullable();
+            // transaction time (payment time)
+            $table->timestamp('transaction_time')->useCurrent();
+
+            // subscription duration
+            $table->timestamp('start_at')->nullable();   // FROM
+            $table->timestamp('end_at')->nullable();     // TO
+
             $table->decimal('amount', 10, 2)->default(0);
-            $table->enum('tran_type', ['purchase', 'renewal']);
+
+            $table->enum('transaction_type', [
+                'purchase',
+                'renewal'
+            ]);
 
             $table->timestamps();
             $table->softDeletes();

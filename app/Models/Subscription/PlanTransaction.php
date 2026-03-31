@@ -14,11 +14,19 @@ class PlanTransaction extends Model
     protected $table = 'plans_transactions';
 
     protected $fillable = [
-        'business_id', 'plan_id', 'tran_time', 'from', 'to', 'amount', 'tran_type'
+        'business_id',
+        'plan_id',
+        'transaction_time',
+        'start_at',
+        'end_at',
+        'amount',
+        'transaction_type'
     ];
 
     protected $casts = [
-        'tran_time' => 'datetime',
+        'transaction_time' => 'datetime',
+        'start_at' => 'datetime',
+        'end_at' => 'datetime',
         'amount' => 'decimal:2',
     ];
 

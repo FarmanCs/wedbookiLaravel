@@ -46,6 +46,8 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
         Route::get('/bookings', \App\Livewire\Vendor\Bookings\Index::class)->name('bookings');
         Route::get('/analytics', \App\Livewire\Vendor\Analytics\Index::class)->name('analytics');
 
+        Route::get('/credits', \App\Livewire\Vendor\Credits\Plans::class)->name('credits');
+
         Route::prefix('business')->name('business.')->group(function () {
             Route::get('/', VendorBusiness::class)->name('index');           // vendor.business.index
             Route::get('/create', CreateEditBusiness::class)->name('create'); // vendor.business.create

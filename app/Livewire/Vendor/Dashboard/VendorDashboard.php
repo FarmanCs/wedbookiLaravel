@@ -10,6 +10,7 @@ use App\Models\Business\Business;
 use App\Models\Business\Package;
 use App\Models\Timing\Timing;
 use App\Models\Category\Category;
+use App\Models\Subscription\Subscription;
 use Illuminate\Support\Facades\Auth;
 
 #[Layout('components.layouts.vendor.vendor')]
@@ -94,6 +95,7 @@ class VendorDashboard extends Component
             $this->loadCategories();
             $this->loadDashboardData();
             $this->loadUpcomingEvents();
+            $this->loadActiveSubscriptions();
         }
     }
 
@@ -458,7 +460,18 @@ class VendorDashboard extends Component
         session()->flash('success', "Package '{$package->name}' created successfully for {$business->company_name}!");
         $this->dispatch('package-created');
     }
-    // public function showCredist() {}
+    // add at the top
+
+    public $activeSubscriptions = [];
+
+
+    public function loadActiveSubscriptions()
+    {
+        $this->activeSubscriptions = Subscription::whereIn('business_id', $this->vendor->businesses()->pluck('id'))
+            ->where('status', 'active')
+            ->with('plan', 'business')
+            ->get();
+    }
 
     // ==================== MESSAGE ====================
     public function openMessageModal()
@@ -488,6 +501,10 @@ class VendorDashboard extends Component
             \Log::error('Error sending message: ' . $e->getMessage());
             session()->flash('error', 'Failed to send message');
         }
+    }
+    public function purchaseCredits()
+    {
+        $this->dispatch('openCreditPlans');
     }
 
     public function render()
