@@ -84,24 +84,34 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
                                         <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
                                             {{ auth('vendor')->user()->email }}</p>
                                     </div>
+                                    <a href="{{ route('vendor.profile') }}"
+                                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                        <x-heroicon-s-user-circle class="w-4 h-4 text-gray-400" />
+                                        My Profile
+                                    </a>
                                     <a href="{{ route('vendor.storefront') }}"
-                                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                         <x-heroicon-s-building-storefront class="w-4 h-4 text-gray-400" />
                                         My Storefront
                                     </a>
                                     <a href="{{ route('vendor.business.index') }}"
-                                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                                         <x-heroicon-s-briefcase class="w-4 h-4 text-gray-400" />
                                         My Businesses
                                     </a>
+                                    <a href="{{ route('vendor.credits') }}"
+                                        class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                        <x-heroicon-s-currency-dollar class="w-4 h-4 text-gray-400" />
+                                        Credits
+                                    </a>
                                     <div class="border-t border-gray-100 dark:border-gray-800 mt-1 pt-1">
-                                        {{-- <form method="POST" action="{{ route('#') }}">
+                                        <form method="POST" action="{{ route('vendor.logout') }}">
                                             @csrf
                                             <button type="submit"
-                                                class="flex items-center gap-2 w-full px-3 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20">
+                                                class="flex items-center gap-2 w-full px-3 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-900/20 transition-colors">
                                                 <x-heroicon-s-arrow-right-on-rectangle class="w-4 h-4" />
                                                 Sign out
-                                            </button> --}}
+                                            </button>
                                         </form>
                                     </div>
                                 </div>
@@ -166,32 +176,90 @@ $watch('darkMode', val => document.documentElement.classList.toggle('dark', val)
         </main>
 
         <!-- Footer -->
-        <footer class="bg-white dark:bg-stone-950 border-t border-gray-200 dark:border-gray-700 mt-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div class="flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div class="flex items-center space-x-3">
-                        <span class="text-lg font-bold text-primary-600 dark:text-primary-400">WEDBOOKI</span>
-                        <span
-                            class="text-xs px-2 py-0.5 rounded-full bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400 font-semibold border border-primary-200 dark:border-primary-800">Vendor
-                            Portal</span>
+        <footer class="mt-12" style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 40%, #1e3a5f 100%);">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                {{-- Top footer strip --}}
+                <div class="py-8 flex flex-col md:flex-row items-center justify-between gap-6">
+
+                    {{-- Brand --}}
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl font-extrabold tracking-tight text-white">WEDBOOKI</span>
+                        <span class="text-xs px-2.5 py-0.5 rounded-full font-semibold border"
+                            style="background: rgba(165,180,252,0.12); border-color: rgba(165,180,252,0.30); color: #c7d2fe;">
+                            Vendor Portal
+                        </span>
                     </div>
-                    <div class="flex flex-wrap justify-center gap-x-6 gap-y-1 text-sm text-gray-500 dark:text-gray-400">
-                        <a href="#"
-                            class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Help &
-                            Support</a>
-                        <a href="#"
-                            class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Privacy
-                            Policy</a>
-                        <a href="#"
-                            class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Vendor
-                            Agreement</a>
-                        <a href="#"
-                            class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Terms of
-                            Service</a>
+
+                    {{-- Links --}}
+                    <div class="flex flex-wrap justify-center gap-x-7 gap-y-2 text-sm"
+                        style="color: rgba(199,210,254,0.75);">
+                        <a href="#" class="transition-colors hover:text-white flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                            </svg>
+                            Help & Support
+                        </a>
+                        <a href="#" class="transition-colors hover:text-white flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            Privacy Policy
+                        </a>
+                        <a href="#" class="transition-colors hover:text-white flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            Vendor Agreement
+                        </a>
+                        <a href="#" class="transition-colors hover:text-white flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                            </svg>
+                            Terms of Service
+                        </a>
                     </div>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">
-                        © {{ date('Y') }} Wedbooki. All rights reserved.
+
+                    {{-- Sign out quick action --}}
+                    @auth('vendor')
+                        <form method="POST" action="{{ route('vendor.logout') }}">
+                            @csrf
+                            <button type="submit"
+                                class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
+                                style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: rgba(199,210,254,0.85);"
+                                onmouseover="this.style.background='rgba(255,255,255,0.14)'"
+                                onmouseout="this.style.background='rgba(255,255,255,0.08)'">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                                </svg>
+                                Sign out
+                            </button>
+                        </form>
+                    @endauth
+                </div>
+
+                {{-- Divider --}}
+                <div style="border-top: 1px solid rgba(165,180,252,0.15);"></div>
+
+                {{-- Bottom strip --}}
+                <div class="py-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+                    <p class="text-xs" style="color: rgba(199,210,254,0.45);">
+                        © {{ date('Y') }} Wedbooki. All rights reserved. Created & Managed by A Cube Creative
+                        Factory
                     </p>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-xs" style="color: rgba(199,210,254,0.45);">All systems operational</span>
+                    </div>
                 </div>
             </div>
         </footer>

@@ -60,6 +60,16 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
         // Profile
         Route::get('/profile', \App\Livewire\Vendor\Profile\Index::class)->name('profile');
     });
+
+    Route::post('/logout', function () {
+
+        Auth::guard('vendor')->logout();
+
+        request()->session()->invalidate();
+        request()->session()->regenerateToken();
+
+        return redirect()->route('vendor.login');
+    })->name('logout');
 });
 
 Route::prefix('host')->name('host.')->group(function () {
