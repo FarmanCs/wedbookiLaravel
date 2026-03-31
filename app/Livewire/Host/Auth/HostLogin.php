@@ -53,7 +53,7 @@ class HostLogin extends Component
 
         session()->regenerate();
 
-        return redirect()->route('host.host-dashboard');
+        return redirect()->route('host.dashboard');
     }
 
     public function render()
