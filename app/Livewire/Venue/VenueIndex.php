@@ -10,7 +10,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Database\Eloquent\Builder;
 
-#[Layout('components.layouts.vendor.vendor')]
+#[Layout('components.layouts.host.host')]
+
 class VenueIndex extends Component
 {
     use WithPagination;

@@ -7,7 +7,8 @@ use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.vendor.vendor')]
+#[Layout('components.layouts.host.host')]
+
 class WeddingVendors extends Component
 {
     public Collection $categories;

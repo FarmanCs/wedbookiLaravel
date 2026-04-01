@@ -2,15 +2,15 @@
 
 namespace App\Livewire\Host\Checklists;
 
+use App\Models\Timing\PersonalizedChecklist;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Host\HostPersonalizedChecklist;
 use Carbon\Carbon;
 
-#[Layout('components.layouts.app')]
+#[Layout('components.layouts.host.host')]
 #[Title('Personalized Checklist')]
 class Personalized extends Component
 {
@@ -21,7 +21,6 @@ class Personalized extends Component
     public string $categoryFilter = 'all';
     public bool $showModal = false;
 
-    // Checklist form fields
     public ?int $checklistId = null;
     public string $check_list_title = '';
     public string $check_list_category = '';
@@ -39,7 +38,7 @@ class Personalized extends Component
             'check_list_category' => ['required', 'string', 'max:100'],
             'check_list_description' => ['nullable', 'string'],
             'check_list_due_date' => ['required', 'date'],
-            'checklist_status' => ['required', 'in:pending,in_progress,completed'],
+            'checklist_status' => ['required', 'in:pending,checked'],
         ];
     }
 
@@ -48,7 +47,7 @@ class Personalized extends Component
         $this->resetForm();
 
         if ($checklistId) {
-            $checklist = HostPersonalizedChecklist::where('id', $checklistId)
+            $checklist = PersonalizedChecklist::where('id', $checklistId)
                 ->where('host_id', Auth::guard('host')->id())
                 ->firstOrFail();
 
@@ -75,7 +74,7 @@ class Personalized extends Component
     {
         $validated = $this->validate();
 
-        HostPersonalizedChecklist::updateOrCreate(
+        PersonalizedChecklist::updateOrCreate(
             ['id' => $this->checklistId],
             [
                 'host_id' => Auth::guard('host')->id(),
@@ -94,18 +93,17 @@ class Personalized extends Component
 
     public function toggleStatus(int $checklistId): void
     {
-        $checklist = HostPersonalizedChecklist::where('id', $checklistId)
+        $checklist = PersonalizedChecklist::where('id', $checklistId)
             ->where('host_id', Auth::guard('host')->id())
             ->firstOrFail();
 
-        $checklist->update([
-            'checklist_status' => $checklist->checklist_status === 'completed' ? 'pending' : 'completed'
-        ]);
+        $newStatus = $checklist->checklist_status === 'checked' ? 'pending' : 'checked';
+        $checklist->update(['checklist_status' => $newStatus]);
     }
 
     public function deleteChecklist(int $checklistId): void
     {
-        HostPersonalizedChecklist::where('id', $checklistId)
+        PersonalizedChecklist::where('id', $checklistId)
             ->where('host_id', Auth::guard('host')->id())
             ->delete();
 
@@ -125,7 +123,7 @@ class Personalized extends Component
 
     public function render()
     {
-        $checklists = HostPersonalizedChecklist::where('host_id', Auth::guard('host')->id())
+        $checklists = PersonalizedChecklist::where('host_id', Auth::guard('host')->id())
             ->when($this->search, function ($query) {
                 $query->where('check_list_title', 'like', '%' . $this->search . '%');
             })
@@ -138,7 +136,7 @@ class Personalized extends Component
             ->orderBy('check_list_due_date')
             ->paginate(15);
 
-        $categories = HostPersonalizedChecklist::where('host_id', Auth::guard('host')->id())
+        $categories = PersonalizedChecklist::where('host_id', Auth::guard('host')->id())
             ->distinct()
             ->pluck('check_list_category');
 

@@ -6,7 +6,8 @@ use App\Models\Business\Business;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.vendor.vendor')]
+#[Layout('components.layouts.host.host')]
+
 class VendorDetail extends Component
 {
     public ?Business $business = null;

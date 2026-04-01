@@ -2,15 +2,15 @@
 
 namespace App\Livewire\Host\Guests;
 
+use App\Models\Guest\Guest;
+use App\Models\Guest\GuestGroup;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Host\Guest;
-use App\Models\Host\GuestGroup;
 
-#[Layout('components.layouts.app')]
+#[Layout('components.layouts.host.host')]
 #[Title('Guests')]
 class Index extends Component
 {
@@ -72,7 +72,8 @@ class Index extends Component
             $this->state = $guest->state ?? '';
             $this->zipcode = $guest->zipcode ?? '';
             $this->is_joining = $guest->is_joining;
-            $this->selectedGroups = $guest->groups->pluck('id')->toArray();
+            // FIX: use guestGroups() instead of groups()
+            $this->selectedGroups = $guest->guestGroups->pluck('id')->toArray();
         }
 
         $this->showModal = true;
@@ -103,8 +104,8 @@ class Index extends Component
             ]
         );
 
-        // Sync groups
-        $guest->groups()->sync($this->selectedGroups);
+        // FIX: use guestGroups() instead of groups()
+        $guest->guestGroups()->sync($this->selectedGroups);
 
         session()->flash('success', $this->guestId ? 'Guest updated successfully.' : 'Guest created successfully.');
         $this->closeModal();
@@ -138,21 +139,21 @@ class Index extends Component
     {
         $hostId = Auth::guard('host')->id();
 
-        $guests = Guest::whereHas('groups', function($query) use ($hostId) {
+        $guests = Guest::whereHas('guestGroups', function ($query) use ($hostId) {
             $query->where('host_id', $hostId);
         })
             ->when($this->search, function ($query) {
-                $query->where(function($q) {
+                $query->where(function ($q) {
                     $q->where('full_name', 'like', '%' . $this->search . '%')
                         ->orWhere('email', 'like', '%' . $this->search . '%');
                 });
             })
             ->when($this->groupFilter, function ($query) {
-                $query->whereHas('groups', function($q) {
+                $query->whereHas('guestGroups', function ($q) {
                     $q->where('guest_groups.id', $this->groupFilter);
                 });
             })
-            ->with('groups')
+            ->with('guestGroups')
             ->paginate(10);
 
         $groups = GuestGroup::where('host_id', $hostId)->get();

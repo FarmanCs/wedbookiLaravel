@@ -6,7 +6,8 @@ use App\Models\Subscription\Plan;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-#[Layout('components.layouts.vendor.vendor')]
+#[Layout('components.layouts.host.host')]
+
 class WeddingPlanner extends Component
 {
     public $plans;

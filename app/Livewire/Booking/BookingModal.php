@@ -7,8 +7,10 @@ use App\Models\Booking\Booking;
 use App\Models\Business\Package;
 use App\Models\Business\Service;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Layout;
 use Livewire\Attributes\On;
 
+#[Layout('components.layouts.host.host')]
 class BookingModal extends Component
 {
     public bool $isOpen = false;

@@ -9,7 +9,8 @@ use Livewire\Component;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
-#[Layout('components.layouts.vendor.vendor')]
+#[Layout('components.layouts.host.host')]
+
 class Detail extends Component
 {
     public Venue $venue;
