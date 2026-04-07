@@ -32,7 +32,7 @@
             <div class="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800">
                 <h2 class="text-lg tracking-wider font-semibold text-zinc-900 dark:text-white">MENU</h2>
                 <button @click="$wire.toggleMobileMenu()" class="p-2">
-                    <flux:icon.x class="h-6 w-6" />
+                    <x-heroicon-o-x-mark class="h-6 w-6"/>
                 </button>
             </div>
 
@@ -116,7 +116,7 @@
                 {{-- Mobile Menu Button --}}
                 <button @click="$wire.toggleMobileMenu()" class="lg:hidden" aria-label="Toggle menu">
                     <flux:icon.bars-3 class="h-7 w-7" x-show="!mobileMenuOpen" />
-                    <flux:icon.x class="h-6 w-6" x-show="mobileMenuOpen" />
+                   <x-heroicon-o-x-mark lass="h-6 w-6" x-show="mobileMenuOpen" />
                 </button>
 
                 <div class="leftNav h-full items-center flex">
