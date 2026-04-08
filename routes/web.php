@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Vendor\Credits\CreditSuccessController;
 use App\Livewire\Booking\BookingModal;
 use App\Livewire\Host\HostDashboard\HostDashboard;
 use App\Livewire\Vendor\Dashboard\VendorDashboard;
@@ -22,7 +23,8 @@ Route::get('/', function () {
 })->name('home');
 
 Route::prefix('vendor')->name('vendor.')->group(function () {
-    // Guest Routes (Not Authenticated)
+
+    // ── Guest Routes ──────────────────────────────────────────────────────────
     Route::middleware('guest')->group(function () {
         Route::get('/signup', \App\Livewire\Vendor\Auth\VendorSignup::class)->name('signup');
         Route::get('/verify-otp', \App\Livewire\Vendor\Auth\VendorVerifyOtp::class)->name('verify-otp');
@@ -32,7 +34,12 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
         })->name('forgot-password');
     });
 
-    // Authenticated Routes
+    // ── IMPORTANT: credits/success MUST be declared BEFORE auth middleware group
+
+    // ─────────────────────────────────────────────────────────────────────────
+    Route::get('/credits/success', [CreditSuccessController::class, 'handle'])
+        ->name('credits.success');
+
     Route::middleware('auth:vendor')->group(function () {
         // Dashboard
         Route::get('/dashboard', VendorDashboard::class)->name('dashboard');
@@ -46,12 +53,14 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
         Route::get('/bookings', \App\Livewire\Vendor\Bookings\Index::class)->name('bookings');
         Route::get('/analytics', \App\Livewire\Vendor\Analytics\Index::class)->name('analytics');
 
+        // ✅ CREDITS — declared AFTER credits/success
         Route::get('/credits', \App\Livewire\Vendor\Credits\Plans::class)->name('credits');
+        Route::get('/credits-center', \App\Livewire\Vendor\Credits\Credits::class)->name('credits.center');
 
         Route::prefix('business')->name('business.')->group(function () {
-            Route::get('/', VendorBusiness::class)->name('index');           // vendor.business.index
-            Route::get('/create', CreateEditBusiness::class)->name('create'); // vendor.business.create
-            Route::get('/{business}/edit', CreateEditBusiness::class)->name('edit'); // vendor.business.edit
+            Route::get('/', VendorBusiness::class)->name('index');
+            Route::get('/create', CreateEditBusiness::class)->name('create');
+            Route::get('/{business}/edit', CreateEditBusiness::class)->name('edit');
         });
 
         // Packages
@@ -62,100 +71,72 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
     });
 
     Route::post('/logout', function () {
-
         Auth::guard('vendor')->logout();
-
         request()->session()->invalidate();
         request()->session()->regenerateToken();
-
         return redirect()->route('vendor.login');
     })->name('logout');
 });
 
+// ── Host Routes ───────────────────────────────────────────────────────────────
 Route::prefix('host')->name('host.')->group(function () {
 
-    // Guest Routes
     Route::middleware('guest')->group(function () {
         Route::get('/signup', HostSignup::class)->name('host-signup');
         Route::get('/verify-otp', \App\Livewire\Host\Auth\HostVerifyOtp::class)->name('verify-otp');
         Route::get('/login', \App\Livewire\Host\Auth\HostLogin::class)->name('login');
-
-        Route::get('/forgot-password', fn() => 'Forgot Password')
-            ->name('forgot-password');
+        Route::get('/forgot-password', fn() => 'Forgot Password')->name('forgot-password');
     });
 
-
-    // Authenticated Host Routes
     Route::middleware('auth:host')->group(function () {
 
-        /* Dashboard */
-        Route::get('/dashboard', HostDashboard::class)
-            ->name('dashboard');
+        Route::get('/dashboard', HostDashboard::class)->name('dashboard');
 
-        /* Vendors */
         Route::prefix('vendors')->name('vendors.')->group(function () {
             Route::get('/', \App\Livewire\Host\Vendors\Index::class)->name('index');
             Route::get('/category/{category}', \App\Livewire\Host\Vendors\CategoryPage::class)->name('category');
             Route::get('/{business}', \App\Livewire\Host\Vendors\Detail::class)->name('detail');
         });
 
-        /* Venues */
         Route::prefix('venues')->name('venues.')->group(function () {
             Route::get('/', VenueIndex::class)->name('index');
             Route::get('/{venue}', Detail::class)->name('detail');
         });
 
-        /* Bookings */
-        Route::get('/bookings', BookingModal::class)
-            ->name('bookings.index');
+        Route::get('/bookings', BookingModal::class)->name('bookings.index');
+        Route::get('/guests', \App\Livewire\Host\Guests\Index::class)->name('guests.index');
 
-        /* Guests */
-        Route::get('/guests', \App\Livewire\Host\Guests\Index::class)
-            ->name('guests.index');
-
-        /* Checklists */
         Route::prefix('checklists')->name('checklists.')->group(function () {
             Route::get('/', \App\Livewire\Host\Checklists\Personalized::class)->name('index');
             Route::get('/personalized', \App\Livewire\Host\Checklists\Personalized::class)->name('personalized');
         });
 
-        // Messages
         Route::get('/messages', \App\Livewire\Host\Messages\Index::class)->name('messages');
-
-        // Budget
         Route::get('/budget', \App\Livewire\Host\Budget\Index::class)->name('budget');
 
-        /* Logout */
         Route::post('/logout', function () {
             Auth::guard('host')->logout();
             session()->invalidate();
             session()->regenerateToken();
-
             return redirect()->route('host.login');
         })->name('logout');
     });
 });
 
-// Public Venue Listing (Optional - for non-authenticated users)
+// ── Public Routes ─────────────────────────────────────────────────────────────
 Route::prefix('wedding-venues')->name('wedding-venues.')->group(function () {
     Route::get('/', VenueIndex::class)->name('index');
     Route::get('/{venue}', Detail::class)->name('detail');
 });
 
-Route::get('/wedding-vendors', WeddingVendors::class)
-    ->name('wedding-vendors.index');
+Route::get('/wedding-vendors', WeddingVendors::class)->name('wedding-vendors.index');
 
 Route::get('/vendor/{vendorId}', VendorDetail::class)
     ->name('vendor.detail')
     ->where('vendorId', '.*');
 
-// Route::get('/vendors/{slug}-{vendorId}', VendorDetail::class)
-//     ->name('vendor.detail.slug');
-
-
 Route::get('/wedding-planner', WeddingPlanner::class)->name('wedding-planner');
 
-// Search route that maps to venue listing  
 Route::get('/search', function () {
     return app(VenueIndex::class)->render();
 })->name('search');

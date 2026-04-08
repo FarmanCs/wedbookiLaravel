@@ -15,8 +15,11 @@ use App\Http\Controllers\Host\GoogleCalendarController;
 use App\Http\Controllers\Host\AccountController;
 use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Admin\AdminController;
-
 use  App\Http\Controllers\Subscription\SubscriptionController;
+
+use App\Http\Controllers\StripeWebhookController;
+
+Route::post('/stripe/webhook', StripeWebhookController::class);
 
 //use App\Http\Controllers\Host\SessionController;
 Route::prefix('/v1/host')->group(function () {
@@ -126,7 +129,6 @@ Route::prefix('/v1/host')->group(function () {
         Route::get('/host-booking-detail/{id}', [BookingController::class, 'hostBookingDetail']);
 
         Route::patch('/get-booked-vendors', [BookingController::class, 'getBookedVendors']);
-
     });
     //pending routes for the moments
     Route::post('/google-auth', [AuthController::class, 'googleLogin']);
@@ -134,8 +136,6 @@ Route::prefix('/v1/host')->group(function () {
     Route::put('/email-change-otp/{id}', [ProfileController::class, 'verifyChangeEmailOtp']);
 
     Route::delete('/delete-account/{id?}', [AccountController::class, 'deleteAccount']);
-
-
 });
 
 //vendors routes goes here
@@ -281,7 +281,6 @@ Route::prefix('/v1/global')->group(function () {
     Route::post('/add-country', [GlobalController::class, 'addCountry']);
     Route::get('/get-countries', [GlobalController::class, 'getCountries']);
     Route::delete('/delete-country/{name}', [GlobalController::class, 'deleteCountry']);
-
 });
 
 
@@ -319,5 +318,4 @@ Route::prefix('v1/subscription')->group(function () {
         Route::get('ad-credits-packages', [SubscriptionController::class, 'getAllAdCreditsPackages']);
         Route::delete('ad-credits-packages/{package}', [SubscriptionController::class, 'deleteAdCreditsPackage']);
     });
-
 });

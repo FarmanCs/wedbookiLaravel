@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('check_list_category')->nullable();
             $table->text('check_list_description')->nullable();
             $table->date('check_list_due_date')->nullable();
-            $table->enum('checklist_status', ['pending', 'checked'])->nullable();
+            $table->string('checklist_status')->nullable();
             $table->string('check_list_item_linked_with')->nullable();
             $table->string('check_list_item_linked_with_id')->nullable();
             $table->string('checklist_linked_booking_id')->nullable();

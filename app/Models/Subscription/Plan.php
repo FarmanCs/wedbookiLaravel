@@ -13,8 +13,15 @@ class Plan extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'name', 'description', 'badge', 'monthly_price', 'quarterly_price',
-        'yearly_price', 'category_id', 'is_active', 'published_at',
+        'name',
+        'description',
+        'badge',
+        'monthly_price',
+        'quarterly_price',
+        'yearly_price',
+        'category_id',
+        'is_active',
+        'published_at',
     ];
 
     protected $casts = [

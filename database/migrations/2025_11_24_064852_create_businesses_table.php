@@ -40,6 +40,7 @@ return new class extends Migration {
             $table->integer('social_count')->default(0);
             $table->timestamp('last_login')->nullable();
             $table->integer('payment_days_advance')->default(7);
+            $table->unsignedInteger('ad_credits')->default(0);
             $table->integer('payment_days_final')->default(1);
             $table->integer('services_radius')->default(50);
             $table->decimal('advance_percentage', 5, 2)->default(10);

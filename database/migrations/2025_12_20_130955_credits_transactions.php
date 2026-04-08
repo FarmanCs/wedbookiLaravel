@@ -11,22 +11,39 @@ return new class extends Migration
         Schema::create('credits_transactions', function (Blueprint $table) {
             $table->id();
 
-            // Foreign key to businesses table
             $table->foreignId('business_id')
+                ->nullable()
                 ->constrained('businesses')
-                ->onDelete('cascade');
+                ->nullOnDelete();
+
+            $table->foreignId('vendor_id')
+                ->nullable()
+                ->constrained('vendors')
+                ->nullOnDelete();
+
+            $table->foreignId('credit_plan_id')
+                ->nullable()
+                ->constrained('credit_plans')
+                ->nullOnDelete();
 
 
             $table->integer('no_of_credits')->default(0);
             $table->decimal('amount', 10, 2)->default(0);
 
-            $table->string('from')->nullable();
-            $table->string('to')->nullable();
+            // avoid reserved keywords
+            $table->string('from_source')->nullable();
+            $table->string('to_source')->nullable();
+            $table->integer('ad_credits')->default(0);
 
-            $table->enum('tran_type', ['credit', 'debit']);
 
-            $table->timestamps(); // includes created_at & updated_at
-            $table->softDeletes(); // adds deleted_at for soft deletes
+            $table->string('stripe_session_id')->nullable()->unique();
+            $table->string('payment_intent_id')->nullable();
+            $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
+            $table->enum('tran_type', ['purchase', 'refund', 'adjustment'])->default('purchase');
+            $table->timestamp('from')->nullable();
+            $table->timestamp('to')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
