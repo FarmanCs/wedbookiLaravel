@@ -222,7 +222,7 @@
         {{-- ══ SUB-NAVIGATION ══ --}}
         <div class="bg-white dark:bg-stone-950 border-b border-gray-200 dark:border-gray-700 mb-2">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex gap-0.5 overflow-x-auto py-2 scrollbar-hide">
+                <div class="flex gap-0.5  overflow-hidden py-2 scrollbar-hide">
                     @php
                         $navItems = [
                             ['route' => 'vendor.dashboard', 'label' => 'Dashboard', 'match' => 'vendor.dashboard'],

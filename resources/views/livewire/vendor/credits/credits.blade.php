@@ -1,16 +1,21 @@
 <div class="cr-root" x-data x-on:stripe-redirect.window="window.location.href = $event.detail.url">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         .cr-root {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             padding: 2rem 1rem 4rem;
             position: relative;
+            background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 50%, #fef3ff 100%);
         }
 
-        /* ── Background ── */
+        .dark .cr-root {
+            background: linear-gradient(135deg, #0a0e1a 0%, #0f1419 50%, #13111a 100%);
+        }
+
+        /* ── Background Effects ── */
         .cr-bg {
             position: fixed;
             inset: 0;
@@ -22,41 +27,79 @@
         .cr-bg__orb {
             position: absolute;
             border-radius: 50%;
-            filter: blur(90px);
-            opacity: .15;
+            filter: blur(100px);
+            opacity: .2;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+
+            66% {
+                transform: translate(-30px, 30px) scale(0.9);
+            }
         }
 
         .cr-bg__orb--1 {
-            width: 600px;
-            height: 600px;
-            background: #6366f1;
-            top: -200px;
-            right: -150px;
+            width: 700px;
+            height: 700px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            top: -300px;
+            right: -200px;
+            animation-delay: 0s;
         }
 
         .cr-bg__orb--2 {
-            width: 500px;
-            height: 500px;
-            background: #a855f7;
-            bottom: -150px;
-            left: -100px;
+            width: 600px;
+            height: 600px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            bottom: -200px;
+            left: -150px;
+            animation-delay: -7s;
         }
 
         .cr-bg__orb--3 {
-            width: 300px;
-            height: 300px;
-            background: #38bdf8;
-            top: 40%;
-            left: 40%;
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -14s;
         }
 
         .dark .cr-bg__orb {
-            opacity: .08;
+            opacity: .12;
+        }
+
+        /* ── Grid Pattern Overlay ── */
+        .cr-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .dark .cr-bg::after {
+            background-image:
+                linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
         }
 
         /* ── Wrap ── */
         .cr-wrap {
-            max-width: 1200px;
+            max-width: 1280px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
@@ -64,271 +107,538 @@
 
         /* ── Header ── */
         .cr-header {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
+            text-align: center;
         }
 
         .cr-header__eyebrow {
             display: inline-flex;
             align-items: center;
-            gap: .4rem;
-            font-size: .72rem;
+            gap: .5rem;
+            font-size: .75rem;
             font-weight: 700;
-            letter-spacing: .12em;
+            letter-spacing: .1em;
             text-transform: uppercase;
-            color: #818cf8;
-            margin-bottom: .5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: .75rem;
+        }
+
+        .dark .cr-header__eyebrow {
+            background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .cr-header__title {
-            font-size: 1.9rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #38bdf8 100%);
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             line-height: 1.2;
-            margin: 0 0 .35rem;
+            margin: 0 0 .75rem;
+            letter-spacing: -0.02em;
+        }
+
+        .dark .cr-header__title {
+            background: linear-gradient(135deg, #a78bfa 0%, #c084fc 50%, #e879f9 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .cr-header__sub {
-            font-size: .875rem;
+            font-size: 1.05rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .dark .cr-header__sub {
             color: #94a3b8;
         }
 
-        /* ── Balance card ── */
+        /* ── Balance Card ── */
         .cr-balance {
-            background: linear-gradient(135deg, rgba(99, 102, 241, .12), rgba(168, 85, 247, .09), rgba(56, 189, 248, .08));
-            border: 1px solid rgba(99, 102, 241, .22);
-            border-radius: 20px;
-            padding: 1.75rem 2rem;
-            margin-bottom: 2rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 1.5rem;
+            gap: 2rem;
             flex-wrap: wrap;
-            backdrop-filter: blur(20px);
             position: relative;
             overflow: hidden;
+            box-shadow:
+                0 20px 60px rgba(102, 126, 234, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset;
+        }
+
+        .dark .cr-balance {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(71, 85, 105, 0.2) inset;
         }
 
         .cr-balance::before {
             content: '';
             position: absolute;
             inset: 0;
-            background: linear-gradient(135deg, rgba(255, 255, 255, .05), transparent);
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(167, 139, 250, 0.05));
             border-radius: inherit;
+        }
+
+        .dark .cr-balance::before {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08), rgba(192, 132, 252, 0.08));
         }
 
         .cr-balance__left {
             display: flex;
             align-items: center;
-            gap: 1.2rem;
+            gap: 1.5rem;
+            position: relative;
         }
 
         .cr-balance__icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 15px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            box-shadow: 0 8px 24px rgba(99, 102, 241, .4);
+            box-shadow:
+                0 10px 40px rgba(102, 126, 234, 0.4),
+                0 0 0 4px rgba(102, 126, 234, 0.1);
+            position: relative;
+        }
+
+        .dark .cr-balance__icon {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            box-shadow:
+                0 10px 40px rgba(139, 92, 246, 0.4),
+                0 0 0 4px rgba(139, 92, 246, 0.1);
+        }
+
+        .cr-balance__icon::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.5;
+            filter: blur(8px);
+        }
+
+        .dark .cr-balance__icon::after {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7);
         }
 
         .cr-balance__icon svg {
-            width: 26px;
-            height: 26px;
+            width: 36px;
+            height: 36px;
             color: #fff;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
         }
 
         .cr-balance__label {
-            font-size: .75rem;
-            font-weight: 600;
-            color: #94a3b8;
-            letter-spacing: .05em;
+            font-size: .8rem;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: .08em;
             text-transform: uppercase;
-            margin-bottom: .15rem;
+            margin-bottom: .4rem;
+        }
+
+        .dark .cr-balance__label {
+            color: #94a3b8;
         }
 
         .cr-balance__amount {
-            font-size: 2.6rem;
+            font-size: 3.5rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #818cf8, #c084fc);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
             line-height: 1;
+            letter-spacing: -0.02em;
+        }
+
+        .dark .cr-balance__amount {
+            background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .cr-balance__sub {
-            font-size: .78rem;
+            font-size: .9rem;
             color: #64748b;
-            margin-top: .2rem;
+            margin-top: .5rem;
+        }
+
+        .dark .cr-balance__sub {
+            color: #94a3b8;
+        }
+
+        .cr-balance__stats {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .cr-stat {
+            text-align: center;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .dark .cr-stat {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .cr-stat__value {
+            font-size: 1.75rem;
+            font-weight: 900;
+            margin-bottom: .25rem;
+        }
+
+        .cr-stat__value--primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dark .cr-stat__value--primary {
+            background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cr-stat__value--secondary {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .dark .cr-stat__value--secondary {
+            background: linear-gradient(135deg, #60a5fa 0%, #38bdf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .cr-stat__label {
+            font-size: .7rem;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+        }
+
+        .dark .cr-stat__label {
+            color: #94a3b8;
         }
 
         /* ── Tabs ── */
         .cr-tabs {
             display: flex;
-            gap: .4rem;
-            margin-bottom: 2rem;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(148, 163, 184, .14);
-            border-radius: 14px;
-            padding: .3rem;
-            width: fit-content;
+            gap: .5rem;
+            margin-bottom: 2.5rem;
+            background: rgba(255, 255, 255, 0.6);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            padding: .5rem;
+            width: fit-content;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+        }
+
+        .dark .cr-tabs {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
         }
 
         .cr-tab {
-            padding: .5rem 1.3rem;
-            border-radius: 10px;
-            font-size: .85rem;
-            font-weight: 600;
+            padding: .75rem 1.5rem;
+            border-radius: 12px;
+            font-size: .9rem;
+            font-weight: 700;
             cursor: pointer;
             border: none;
             background: transparent;
             color: #64748b;
-            transition: all .2s;
+            transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
             font-family: inherit;
             display: flex;
             align-items: center;
-            gap: .5rem;
-        }
-
-        .cr-tab.active {
-            background: linear-gradient(135deg, #6366f1, #a855f7);
-            color: #fff;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, .35);
+            gap: .6rem;
+            position: relative;
         }
 
         .dark .cr-tab {
             color: #94a3b8;
         }
 
+        .cr-tab:hover:not(.active) {
+            background: rgba(102, 126, 234, 0.08);
+            color: #667eea;
+        }
+
+        .dark .cr-tab:hover:not(.active) {
+            background: rgba(139, 92, 246, 0.1);
+            color: #a78bfa;
+        }
+
+        .cr-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            box-shadow:
+                0 8px 24px rgba(102, 126, 234, 0.4),
+                0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .dark .cr-tab.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            box-shadow:
+                0 8px 24px rgba(139, 92, 246, 0.4),
+                0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
         .cr-tab__count {
-            font-size: .68rem;
+            font-size: .75rem;
             font-weight: 800;
-            padding: .1rem .45rem;
+            padding: .2rem .5rem;
             border-radius: 20px;
-            background: rgba(255, 255, 255, .2);
+            background: rgba(255, 255, 255, 0.25);
             color: inherit;
         }
 
         .cr-tab:not(.active) .cr-tab__count {
-            background: rgba(148, 163, 184, .15);
-            color: #64748b;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
         }
 
-        /* ══════════════════════════════════════
-           TABLE STYLES (NEW)
-        ══════════════════════════════════════ */
+        .dark .cr-tab:not(.active) .cr-tab__count {
+            background: rgba(139, 92, 246, 0.15);
+            color: #a78bfa;
+        }
+
+        /* ── Table Styles ── */
         .cr-table-wrapper {
             overflow-x: auto;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(148, 163, 184, 0.15);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+        }
+
+        .dark .cr-table-wrapper {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
         .cr-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.875rem;
+            font-size: .9rem;
         }
 
         .cr-table th {
             text-align: left;
-            padding: 1rem 1rem;
-            background: rgba(99, 102, 241, 0.05);
+            padding: 1.25rem 1.5rem;
+            background: rgba(102, 126, 234, 0.05);
+            backdrop-filter: blur(10px);
             font-weight: 700;
             color: #1e293b;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+            font-size: .8rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
         }
 
         .dark .cr-table th {
             color: #f1f5f9;
-            background: rgba(99, 102, 241, 0.1);
+            background: rgba(139, 92, 246, 0.08);
+            border-bottom: 1px solid rgba(139, 92, 246, 0.15);
         }
 
         .cr-table td {
-            padding: 1rem;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
             vertical-align: middle;
+            color: #334155;
+        }
+
+        .dark .cr-table td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #cbd5e1;
         }
 
         .cr-table tr:last-child td {
             border-bottom: none;
         }
 
+        .cr-table tr:hover td {
+            background: rgba(102, 126, 234, 0.02);
+        }
+
+        .dark .cr-table tr:hover td {
+            background: rgba(139, 92, 246, 0.05);
+        }
+
         .cr-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
-            padding: 0.2rem 0.6rem;
+            gap: 0.4rem;
+            padding: 0.35rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             font-weight: 700;
+            letter-spacing: 0.02em;
         }
 
-        .cr-badge-success {
-            background: rgba(34, 197, 94, 0.12);
-            color: #16a34a;
+        .cr-badge-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .dark .cr-badge-completed {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .cr-badge-pending {
-            background: rgba(251, 191, 36, 0.12);
+            background: rgba(245, 158, 11, 0.1);
             color: #d97706;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+        }
+
+        .dark .cr-badge-pending {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         .cr-badge-failed {
-            background: rgba(239, 68, 68, 0.12);
+            background: rgba(239, 68, 68, 0.1);
             color: #dc2626;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .dark .cr-badge-failed {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
         .cr-filter-select {
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1.25rem;
             border-radius: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.3);
-            background: rgba(255, 255, 255, 0.6);
-            font-size: 0.8rem;
-            font-weight: 500;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1e293b;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
-        /* ── Available plans grid (unchanged) ── */
+        .dark .cr-filter-select {
+            background: rgba(30, 41, 59, 0.8);
+            color: #f1f5f9;
+            border-color: rgba(71, 85, 105, 0.3);
+        }
+
+        .cr-filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .dark .cr-filter-select:focus {
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.15);
+        }
+
+        /* ── Plans Grid ── */
         .cr-plans-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.4rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
 
         .cr-plan-card {
-            background: rgba(255, 255, 255, .72);
-            border: 1px solid rgba(148, 163, 184, .18);
-            border-radius: 20px;
-            padding: 1.75rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            padding: 2rem;
             position: relative;
             overflow: hidden;
-            transition: transform .25s, box-shadow .25s, border-color .25s;
-            backdrop-filter: blur(16px);
+            transition: all .4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
         }
 
         .dark .cr-plan-card {
-            background: rgba(15, 23, 42, .6);
-            border-color: rgba(148, 163, 184, .12);
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
 
         .cr-plan-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 50px rgba(99, 102, 241, .16);
-            border-color: rgba(99, 102, 241, .38);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.15);
+            border-color: rgba(102, 126, 234, 0.4);
+        }
+
+        .dark .cr-plan-card:hover {
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
         }
 
         .cr-plan-card--featured {
-            border-color: rgba(99, 102, 241, .45);
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, .18), 0 14px 36px rgba(99, 102, 241, .14);
+            border-color: rgba(102, 126, 234, 0.5);
+            box-shadow:
+                0 0 0 3px rgba(102, 126, 234, 0.1),
+                0 20px 60px rgba(102, 126, 234, 0.15);
+            transform: scale(1.02);
+        }
+
+        .dark .cr-plan-card--featured {
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow:
+                0 0 0 3px rgba(139, 92, 246, 0.15),
+                0 20px 60px rgba(139, 92, 246, 0.3);
+        }
+
+        .cr-plan-card--featured:hover {
+            transform: translateY(-8px) scale(1.02);
         }
 
         .cr-plan-card__shimmer {
@@ -336,41 +646,73 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, #6366f1, #a855f7, #38bdf8);
-            border-radius: 20px 20px 0 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb, #667eea);
+            background-size: 200% 100%;
+            border-radius: 24px 24px 0 0;
+            animation: shimmer 3s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 0% 0%;
+            }
+
+            100% {
+                background-position: 200% 0%;
+            }
         }
 
         .cr-plan-card__badge {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            top: 1.25rem;
+            right: 1.25rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
-            font-size: .62rem;
-            font-weight: 700;
-            letter-spacing: .08em;
+            font-size: .65rem;
+            font-weight: 800;
+            letter-spacing: .1em;
             text-transform: uppercase;
-            padding: .22rem .6rem;
+            padding: .35rem .8rem;
             border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .dark .cr-plan-card__badge {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5);
         }
 
         .cr-plan-card__icon-wrap {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.1rem;
-            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .cr-plan-card__icon-wrap::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: inherit;
+            background: inherit;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(12px);
         }
 
         .cr-plan-card__name {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1.35rem;
+            font-weight: 800;
             color: #1e293b;
-            margin-bottom: .25rem;
+            margin-bottom: .5rem;
+            letter-spacing: -0.01em;
         }
 
         .dark .cr-plan-card__name {
@@ -378,41 +720,52 @@
         }
 
         .cr-plan-card__desc {
-            font-size: .8rem;
+            font-size: .875rem;
             color: #64748b;
-            margin-bottom: 1.1rem;
-            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .dark .cr-plan-card__desc {
+            color: #94a3b8;
         }
 
         .cr-plan-card__credits {
             display: flex;
             align-items: baseline;
-            gap: .35rem;
-            margin-bottom: .9rem;
+            gap: .5rem;
+            margin-bottom: 1rem;
         }
 
         .cr-plan-card__credits-num {
-            font-size: 2.1rem;
+            font-size: 2.75rem;
             font-weight: 900;
+            letter-spacing: -0.02em;
         }
 
         .cr-plan-card__credits-label {
-            font-size: .78rem;
+            font-size: .875rem;
             font-weight: 600;
+            color: #64748b;
+        }
+
+        .dark .cr-plan-card__credits-label {
             color: #94a3b8;
         }
 
         .cr-plan-card__pricing {
             display: flex;
             align-items: center;
-            gap: .55rem;
-            margin-bottom: 1.4rem;
+            gap: .75rem;
+            margin-bottom: 1.75rem;
+            flex-wrap: wrap;
         }
 
         .cr-plan-card__price {
-            font-size: 1.35rem;
-            font-weight: 800;
+            font-size: 1.75rem;
+            font-weight: 900;
             color: #1e293b;
+            letter-spacing: -0.01em;
         }
 
         .dark .cr-plan-card__price {
@@ -420,73 +773,108 @@
         }
 
         .cr-plan-card__original {
-            font-size: .82rem;
+            font-size: .95rem;
             color: #94a3b8;
             text-decoration: line-through;
         }
 
         .cr-plan-card__discount {
-            font-size: .7rem;
-            font-weight: 700;
-            background: rgba(34, 197, 94, .14);
-            color: #16a34a;
-            border: 1px solid rgba(34, 197, 94, .22);
-            padding: .14rem .48rem;
+            font-size: .75rem;
+            font-weight: 800;
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: .25rem .65rem;
             border-radius: 20px;
         }
 
         .dark .cr-plan-card__discount {
-            background: rgba(34, 197, 94, .09);
-            color: #4ade80;
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .cr-btn-buy {
             width: 100%;
-            padding: .72rem 1rem;
-            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            border-radius: 14px;
             border: none;
             font-family: inherit;
-            font-size: .875rem;
+            font-size: .95rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all .2s;
+            transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
             color: #fff;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, .28);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cr-btn-buy::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .cr-btn-buy:hover::before {
+            opacity: 1;
         }
 
         .cr-btn-buy:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(99, 102, 241, .42);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
         }
 
-        /* ── Empty states ── */
+        /* ── Empty States ── */
         .cr-empty {
             text-align: center;
-            padding: 3.5rem 2rem;
+            padding: 4rem 2rem;
             color: #94a3b8;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 2px dashed rgba(102, 126, 234, 0.2);
+        }
+
+        .dark .cr-empty {
+            background: rgba(15, 23, 42, 0.5);
+            border-color: rgba(139, 92, 246, 0.2);
         }
 
         .cr-empty__icon {
-            width: 52px;
-            height: 52px;
-            margin: 0 auto 1rem;
-            opacity: .35;
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.5rem;
+            opacity: .3;
+            color: #667eea;
+        }
+
+        .dark .cr-empty__icon {
+            color: #a78bfa;
         }
 
         .cr-empty__title {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: .35rem;
-            color: #64748b;
+            font-size: 1.25rem;
+            font-weight: 800;
+            margin-bottom: .5rem;
+            color: #475569;
         }
 
         .dark .cr-empty__title {
-            color: #94a3b8;
+            color: #cbd5e1;
         }
 
         .cr-empty__sub {
-            font-size: .825rem;
-            line-height: 1.5;
+            font-size: .95rem;
+            line-height: 1.6;
+            color: #64748b;
+        }
+
+        .dark .cr-empty__sub {
+            color: #94a3b8;
         }
 
         /* ── Modal ── */
@@ -494,71 +882,97 @@
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background: rgba(0, 0, 0, .55);
-            backdrop-filter: blur(6px);
+            background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(12px);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1rem;
+            animation: fadeIn .3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         .cr-modal {
-            background: #fff;
-            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
             width: 100%;
-            max-width: 480px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, .22);
+            max-width: 520px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
             overflow: hidden;
-            animation: cr-slide-up .3s cubic-bezier(.16, 1, .3, 1);
+            animation: slideUp .4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
         }
 
         .dark .cr-modal {
-            background: #0f172a;
-            border: 1px solid rgba(148, 163, 184, .15);
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(71, 85, 105, 0.3);
         }
 
-        @keyframes cr-slide-up {
+        @keyframes slideUp {
             from {
-                transform: translateY(24px);
-                opacity: 0
+                transform: translateY(40px);
+                opacity: 0;
             }
 
             to {
                 transform: translateY(0);
-                opacity: 1
+                opacity: 1;
             }
         }
 
         .cr-modal__header {
-            padding: 1.4rem 1.6rem 1.1rem;
-            border-bottom: 1px solid rgba(148, 163, 184, .12);
+            padding: 1.75rem 2rem 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
             display: flex;
             align-items: center;
-            gap: .75rem;
+            gap: 1rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.02));
+        }
+
+        .dark .cr-modal__header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(168, 85, 247, 0.03));
         }
 
         .cr-modal__header-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 11px;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+        }
+
+        .dark .cr-modal__header-icon {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
         }
 
         .cr-modal__header-icon svg {
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             color: #fff;
         }
 
         .cr-modal__title {
-            font-size: 1rem;
-            font-weight: 700;
+            font-size: 1.2rem;
+            font-weight: 800;
             color: #1e293b;
             flex: 1;
+            letter-spacing: -0.01em;
         }
 
         .dark .cr-modal__title {
@@ -566,61 +980,92 @@
         }
 
         .cr-modal__close {
-            width: 30px;
-            height: 30px;
-            border-radius: 8px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             border: none;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.04);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #64748b;
+            transition: all .2s;
+        }
+
+        .dark .cr-modal__close {
+            background: rgba(255, 255, 255, 0.05);
             color: #94a3b8;
-            transition: background .15s;
         }
 
         .cr-modal__close:hover {
-            background: rgba(148, 163, 184, .15);
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+        }
+
+        .dark .cr-modal__close:hover {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
         }
 
         .cr-modal__body {
-            padding: 1.4rem 1.6rem;
+            padding: 2rem;
             display: flex;
             flex-direction: column;
-            gap: 1.1rem;
+            gap: 1.5rem;
         }
 
         .cr-modal__footer {
-            padding: 1.1rem 1.6rem;
-            border-top: 1px solid rgba(148, 163, 184, .12);
+            padding: 1.5rem 2rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.06);
             display: flex;
             justify-content: flex-end;
-            gap: .7rem;
+            gap: 1rem;
+            background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.01));
+        }
+
+        .dark .cr-modal__footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.02));
         }
 
         .cr-modal-summary {
-            background: linear-gradient(135deg, rgba(99, 102, 241, .08), rgba(168, 85, 247, .05));
-            border: 1px solid rgba(99, 102, 241, .18);
-            border-radius: 13px;
-            padding: 1.1rem;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.08), rgba(118, 75, 162, 0.05));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(102, 126, 234, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
             display: flex;
             align-items: center;
-            gap: .9rem;
+            gap: 1.25rem;
+        }
+
+        .dark .cr-modal-summary {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.08));
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
 
         .cr-modal-summary__credits {
-            font-size: 1.9rem;
+            font-size: 2.25rem;
             font-weight: 900;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            letter-spacing: -0.02em;
+        }
+
+        .dark .cr-modal-summary__credits {
+            background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .cr-modal-summary__name {
-            font-size: .88rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 800;
             color: #1e293b;
+            margin-bottom: .25rem;
         }
 
         .dark .cr-modal-summary__name {
@@ -628,87 +1073,139 @@
         }
 
         .cr-modal-summary__price {
-            font-size: .78rem;
+            font-size: .875rem;
             color: #64748b;
-            margin-top: .12rem;
+        }
+
+        .dark .cr-modal-summary__price {
+            color: #94a3b8;
         }
 
         .cr-field {
             display: flex;
             flex-direction: column;
-            gap: .4rem;
+            gap: .6rem;
         }
 
         .cr-label {
-            font-size: .72rem;
-            font-weight: 700;
-            color: #64748b;
-            letter-spacing: .04em;
+            font-size: .75rem;
+            font-weight: 800;
+            color: #475569;
+            letter-spacing: .06em;
             text-transform: uppercase;
+        }
+
+        .dark .cr-label {
+            color: #cbd5e1;
         }
 
         .cr-select {
             width: 100%;
-            padding: .7rem .95rem;
-            border-radius: 10px;
-            border: 1px solid rgba(148, 163, 184, .28);
-            background: rgba(255, 255, 255, .85);
+            padding: .95rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             color: #1e293b;
-            font-size: .875rem;
+            font-size: .95rem;
             font-family: inherit;
+            font-weight: 600;
             outline: none;
-            transition: border-color .15s, box-shadow .15s;
+            transition: all .2s;
             appearance: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         }
 
         .dark .cr-select {
-            background: rgba(30, 41, 59, .8);
+            background: rgba(30, 41, 59, 0.9);
             color: #f1f5f9;
-            border-color: rgba(148, 163, 184, .2);
+            border-color: rgba(71, 85, 105, 0.3);
         }
 
         .cr-select:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, .14);
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .dark .cr-select:focus {
+            border-color: #a78bfa;
+            box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.15);
         }
 
         .cr-btn-cancel {
-            padding: .6rem 1.2rem;
-            border-radius: 10px;
-            border: 1px solid rgba(148, 163, 184, .22);
-            background: transparent;
+            padding: .85rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
             font-family: inherit;
-            font-size: .85rem;
-            font-weight: 600;
-            color: #64748b;
+            font-size: .9rem;
+            font-weight: 700;
+            color: #475569;
             cursor: pointer;
-            transition: all .15s;
+            transition: all .2s;
+        }
+
+        .dark .cr-btn-cancel {
+            background: rgba(30, 41, 59, 0.8);
+            border-color: rgba(71, 85, 105, 0.3);
+            color: #cbd5e1;
         }
 
         .cr-btn-cancel:hover {
-            background: rgba(148, 163, 184, .1);
+            background: rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.2);
+        }
+
+        .dark .cr-btn-cancel:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(71, 85, 105, 0.5);
         }
 
         .cr-btn-confirm {
-            padding: .6rem 1.4rem;
-            border-radius: 10px;
+            padding: .85rem 1.75rem;
+            border-radius: 12px;
             border: none;
-            background: linear-gradient(135deg, #6366f1, #a855f7);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: #fff;
             font-family: inherit;
-            font-size: .85rem;
-            font-weight: 700;
+            font-size: .9rem;
+            font-weight: 800;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(99, 102, 241, .28);
-            transition: all .2s;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+            transition: all .3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
-            gap: .45rem;
+            gap: .6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dark .cr-btn-confirm {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a855f7 100%);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+        }
+
+        .cr-btn-confirm::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .cr-btn-confirm:hover::before {
+            opacity: 1;
         }
 
         .cr-btn-confirm:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, .38);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.5);
+        }
+
+        .dark .cr-btn-confirm:hover {
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.6);
         }
 
         .cr-btn-confirm:disabled {
@@ -718,14 +1215,100 @@
         }
 
         .cr-spinner {
-            width: 15px;
-            height: 15px;
+            width: 16px;
+            height: 16px;
             animation: spin 1s linear infinite;
         }
 
         @keyframes spin {
             to {
                 transform: rotate(360deg);
+            }
+        }
+
+        /* ── Flash Messages ── */
+        .cr-flash {
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            font-size: .9rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 1px solid;
+            animation: slideDown .4s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .cr-flash--success {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .dark .cr-flash--success {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border-color: rgba(16, 185, 129, 0.4);
+        }
+
+        .cr-flash--error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #dc2626;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        .dark .cr-flash--error {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.4);
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .cr-header__title {
+                font-size: 2rem;
+            }
+
+            .cr-balance {
+                padding: 1.75rem;
+            }
+
+            .cr-balance__amount {
+                font-size: 2.5rem;
+            }
+
+            .cr-balance__icon {
+                width: 64px;
+                height: 64px;
+            }
+
+            .cr-balance__icon svg {
+                width: 28px;
+                height: 28px;
+            }
+
+            .cr-plans-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cr-table-wrapper {
+                font-size: .8rem;
+            }
+
+            .cr-table th,
+            .cr-table td {
+                padding: 1rem;
             }
         }
     </style>
@@ -741,29 +1324,28 @@
 
         {{-- Flash messages --}}
         @if (session('success'))
-            <div
-                class="mb-4 p-3 rounded-lg bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border border-green-200 dark:border-green-800">
-                {{ session('success') }}
+            <div class="cr-flash cr-flash--success">
+                ✓ {{ session('success') }}
             </div>
         @endif
         @if (session('error'))
-            <div
-                class="mb-4 p-3 rounded-lg bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
-                {{ session('error') }}
+            <div class="cr-flash cr-flash--error">
+                ✕ {{ session('error') }}
             </div>
         @endif
 
         {{-- Page header --}}
         <div class="cr-header">
             <div class="cr-header__eyebrow">
-                <svg viewBox="0 0 20 20" fill="currentColor" style="width:11px;height:11px;">
+                <svg viewBox="0 0 20 20" fill="currentColor" style="width:12px;height:12px;">
                     <path
                         d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                Ad Credits
+                Premium Credits
             </div>
             <h1 class="cr-header__title">Manage Your Credits</h1>
-            <p class="cr-header__sub">Purchase ad credits to boost your business visibility across Wedbooki</p>
+            <p class="cr-header__sub">Purchase ad credits to boost your business visibility and reach more couples
+                across Wedbooki</p>
         </div>
 
         {{-- Balance card --}}
@@ -785,21 +1367,15 @@
                         completed</div>
                 </div>
             </div>
-            <div style="display:flex;gap:.75rem;flex-wrap:wrap;align-items:center;">
-                <div
-                    style="text-align:center;padding:.6rem 1rem;border-radius:12px;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2);">
-                    <div style="font-size:1.2rem;font-weight:900;color:#818cf8;">
+            <div class="cr-balance__stats">
+                <div class="cr-stat">
+                    <div class="cr-stat__value cr-stat__value--primary">
                         {{ $transactions->where('status', 'completed')->count() }}</div>
-                    <div
-                        style="font-size:.68rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">
-                        Purchased</div>
+                    <div class="cr-stat__label">Purchased</div>
                 </div>
-                <div
-                    style="text-align:center;padding:.6rem 1rem;border-radius:12px;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.18);">
-                    <div style="font-size:1.2rem;font-weight:900;color:#38bdf8;">{{ $availablePlans->count() }}</div>
-                    <div
-                        style="font-size:.68rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">
-                        Available</div>
+                <div class="cr-stat">
+                    <div class="cr-stat__value cr-stat__value--secondary">{{ $availablePlans->count() }}</div>
+                    <div class="cr-stat__label">Available</div>
                 </div>
             </div>
         </div>
@@ -817,9 +1393,7 @@
             </button>
         </div>
 
-        {{-- ══════════════════════════════════════
-             TAB: MY PURCHASES (TABLE VIEW)
-        ══════════════════════════════════════ --}}
+        {{-- TAB: MY PURCHASES --}}
         @if ($activeTab === 'purchased')
             <div class="mb-4 flex justify-end">
                 <select wire:model.live="purchasedTabBusinessFilter" class="cr-filter-select">
@@ -838,7 +1412,8 @@
                             clip-rule="evenodd" />
                     </svg>
                     <div class="cr-empty__title">No purchases yet</div>
-                    <div class="cr-empty__sub">Switch to <strong>Buy Credits</strong> tab to get started.</div>
+                    <div class="cr-empty__sub">Switch to <strong>Buy Credits</strong> tab to get started and boost your
+                        business.</div>
                 </div>
             @else
                 <div class="cr-table-wrapper">
@@ -857,18 +1432,20 @@
                         <tbody>
                             @foreach ($transactions as $tx)
                                 <tr>
-                                    <td class="font-semibold">{{ $tx->creditPlan?->name ?? 'N/A' }}</td>
+                                    <td style="font-weight:700;">{{ $tx->creditPlan?->name ?? 'N/A' }}</td>
                                     <td>{{ $tx->business?->company_name ?? '—' }}</td>
-                                    <td class="font-bold text-indigo-600 dark:text-indigo-400">
-                                        +{{ number_format($tx->no_of_credits) }}</td>
-                                    <td>${{ number_format($tx->amount, 2) }}</td>
+                                    <td
+                                        style="font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
+                                        +{{ number_format($tx->no_of_credits) }}
+                                    </td>
+                                    <td style="font-weight:700;">${{ number_format($tx->amount, 2) }}</td>
                                     <td>{{ $tx->created_at->format('d M Y, H:i') }}</td>
                                     <td>
                                         <span class="cr-badge cr-badge-{{ $tx->status }}">
                                             {{ ucfirst($tx->status) }}
                                         </span>
                                     </td>
-                                    <td class="font-mono text-xs text-slate-500">
+                                    <td style="font-family:monospace;font-size:.8rem;color:#94a3b8;">
                                         {{ substr($tx->payment_intent_id ?? ($tx->stripe_session_id ?? ''), 0, 12) }}…
                                     </td>
                                 </tr>
@@ -879,9 +1456,7 @@
             @endif
         @endif
 
-        {{-- ══════════════════════════════════════
-             TAB: BUY CREDITS (GRID WITH BUSINESS FILTER)
-        ══════════════════════════════════════ --}}
+        {{-- TAB: BUY CREDITS --}}
         @if ($activeTab === 'buy')
             <div class="mb-6 flex items-center gap-4 flex-wrap">
                 <label class="cr-label">Buy credits for business:</label>
@@ -899,19 +1474,20 @@
                             d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                             clip-rule="evenodd" />
                     </svg>
-                    <div class="cr-empty__title">No new plans available</div>
-                    <div class="cr-empty__sub">You have already purchased all credit plans for this business.</div>
+                    <div class="cr-empty__title">All plans purchased</div>
+                    <div class="cr-empty__sub">You have already purchased all available credit plans for this business.
+                        Check back later for new offers!</div>
                 </div>
             @else
                 <div class="cr-plans-grid">
                     @php
                         $planColors = [
-                            ['from' => '#6366f1', 'to' => '#818cf8'],
-                            ['from' => '#f59e0b', 'to' => '#fbbf24'],
-                            ['from' => '#10b981', 'to' => '#34d399'],
-                            ['from' => '#8b5cf6', 'to' => '#c084fc'],
-                            ['from' => '#ef4444', 'to' => '#f87171'],
-                            ['from' => '#0ea5e9', 'to' => '#38bdf8'],
+                            ['from' => '#667eea', 'to' => '#764ba2'],
+                            ['from' => '#f093fb', 'to' => '#f5576c'],
+                            ['from' => '#4facfe', 'to' => '#00f2fe'],
+                            ['from' => '#fa709a', 'to' => '#fee140'],
+                            ['from' => '#30cfd0', 'to' => '#330867'],
+                            ['from' => '#a8edea', 'to' => '#fed6e3'],
                         ];
                         $planIcons = ['💎', '⚡', '🚀', '👑', '🎯', '🌟'];
                     @endphp
@@ -938,7 +1514,8 @@
                             </div>
                             <div class="cr-plan-card__name">{{ $plan->name }}</div>
                             <div class="cr-plan-card__desc">
-                                {{ $plan->description ?? 'Boost your listings and reach more couples.' }}</div>
+                                {{ $plan->description ?? 'Boost your listings and reach more couples planning their special day.' }}
+                            </div>
                             <div class="cr-plan-card__credits">
                                 <span class="cr-plan-card__credits-num"
                                     style="background:linear-gradient(135deg,{{ $pc['from'] }},{{ $pc['to'] }});-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
@@ -963,9 +1540,9 @@
             @endif
         @endif
 
-    </div>{{-- /cr-wrap --}}
+    </div>
 
-    {{-- ══ Purchase Confirmation Modal ══ --}}
+    {{-- Purchase Confirmation Modal --}}
     @if ($showModal && $selectedPlan)
         @php
             $finalPrice =
@@ -1003,7 +1580,7 @@
                                     <span
                                         style="text-decoration:line-through;color:#94a3b8;margin-left:.3rem;">${{ number_format($selectedPlan->price, 2) }}</span>
                                     <span
-                                        style="color:#16a34a;font-weight:700;margin-left:.2rem;">({{ $selectedPlan->discounted_percentage }}%
+                                        style="color:#059669;font-weight:700;margin-left:.2rem;">({{ $selectedPlan->discounted_percentage }}%
                                         off)</span>
                                 @endif
                             </div>
@@ -1018,13 +1595,13 @@
                             @endforeach
                         </select>
                         @error('selectedPurchaseBusinessId')
-                            <span style="font-size:.74rem;color:#dc2626;font-weight:600;">{{ $message }}</span>
+                            <span style="font-size:.8rem;color:#dc2626;font-weight:700;">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <p
-                        style="font-size:.78rem;color:#64748b;line-height:1.55;padding:.7rem .9rem;background:rgba(148,163,184,.07);border-radius:10px;border:1px solid rgba(148,163,184,.14);">
-                        🔒 You'll be redirected to Stripe's secure checkout. Credits are added to your business
+                        style="font-size:.85rem;color:#64748b;line-height:1.6;padding:.9rem 1.1rem;background:rgba(102,126,234,.05);border-radius:12px;border:1px solid rgba(102,126,234,.15);">
+                        🔒 You'll be securely redirected to Stripe's checkout page. Credits are added to your business
                         instantly after payment confirmation.
                     </p>
                 </div>

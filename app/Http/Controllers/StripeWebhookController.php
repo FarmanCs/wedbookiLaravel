@@ -36,8 +36,6 @@ class StripeWebhookController extends Controller
             return response('Invalid signature', 400);
         }
 
-        Log::info('[Webhook] Received event: ' . $event->type);
-
         // ── 2. Route events ───────────────────────────────────────────────────
         match ($event->type) {
             'checkout.session.completed' => $this->handleCheckoutCompleted($event->data->object),
