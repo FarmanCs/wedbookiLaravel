@@ -1,7 +1,7 @@
 <?php
 
+use App\Http\Controllers\Host\Booking\PaymentController;
 use App\Http\Controllers\Vendor\Credits\CreditSuccessController;
-use App\Livewire\Booking\BookingModal;
 use App\Livewire\Host\HostDashboard\HostDashboard;
 use App\Livewire\Vendor\Dashboard\VendorDashboard;
 use App\Livewire\Venue\VenueIndex;
@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use \App\Livewire\Host\Auth\HostSignup;
+use App\Livewire\Host\Bookings\BookingComponent;
 use App\Livewire\Vendor\Business\CreateEditBusiness;
 use App\Livewire\Vendor\Business\VendorBusiness;
 use App\Livewire\Vendor\Packages\Packages;
@@ -103,7 +104,38 @@ Route::prefix('host')->name('host.')->group(function () {
             Route::get('/{venue}', Detail::class)->name('detail');
         });
 
-        Route::get('/bookings', BookingModal::class)->name('bookings.index');
+        // Route::get('/bookings', BookingComponent::class)->name('bookings.index');
+        Route::prefix('bookings')->name('bookings.')->group(function () {
+
+            // Main bookings list (Livewire component)
+            Route::get('/', BookingComponent::class)->name('index');
+
+            // Create new booking
+            Route::get('/create', function () {
+                return view('host.bookings.create');
+            })->name('create');
+
+            // View booking details
+            Route::get('/{booking}', function ($booking) {
+                return view('host.bookings.show', compact('booking'));
+            })->name('show');
+
+            // Edit booking
+            Route::get('/{booking}/edit', function ($booking) {
+                return view('host.bookings.edit', compact('booking'));
+            })->name('edit');
+
+            // Payment Routes
+            Route::prefix('payment')->name('payment.')->group(function () {
+                // Success callback from Stripe
+                Route::get('/success/{booking}', [PaymentController::class, 'success'])
+                    ->name('success');
+
+                // Cancel callback from Stripe
+                Route::get('/cancel', [PaymentController::class, 'cancel'])
+                    ->name('cancel');
+            });
+        });
         Route::get('/guests', \App\Livewire\Host\Guests\Index::class)->name('guests.index');
 
         Route::prefix('checklists')->name('checklists.')->group(function () {

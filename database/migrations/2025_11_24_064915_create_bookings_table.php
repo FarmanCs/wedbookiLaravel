@@ -10,61 +10,57 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-
             // Foreign relationships
             $table->foreignId('host_id')->constrained('hosts')->onDelete('cascade');
             $table->foreignId('business_id')->constrained('businesses')->onDelete('cascade');
             $table->foreignId('vendor_id')->nullable()->constrained('vendors')->nullOnDelete();
+            $table->foreignId('venue_id')->constrained('venues')->cascadeOnDelete();
             $table->foreignId('package_id')->nullable()->constrained('packages')->nullOnDelete();
-
+            $table->date('event_date');
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
+            $table->integer('guest_count')->default(0);
+            $table->decimal('total_amount', 10, 2);
+            $table->string('stripe_payment_intent_id')->nullable();
+            $table->string('stripe_session_id')->nullable();
             // Unique booking ID
             $table->string('custom_booking_id')->unique();
-
+            $table->text('special_requests')->nullable();
             // Amounts
             $table->decimal('amount', 15, 2)->default(0);
             $table->decimal('advance_percentage', 5, 2)->nullable();
             $table->decimal('advance_amount', 15, 2)->nullable();
             $table->decimal('final_amount', 15, 2)->nullable();
-
             // Dates
             $table->date('advance_due_date')->nullable();
             $table->date('final_due_date')->nullable();
             $table->date('event_date')->nullable();
-
             // Times
             $table->string('timezone')->nullable();
             $table->enum('time_slot', ['morning', 'afternoon', 'evening'])->nullable();
             $table->integer('guests')->default(0);
-
             // Status flags
             $table->boolean('advance_paid')->default(false);
             $table->boolean('final_paid')->default(false);
-
             // Status
             $table->enum('status', [
-                'pending', 'accepted', 'rejected', 'cancelled', 'confirmed', 'completed'
+                'pending',
+                'accepted',
+                'rejected',
+                'cancelled',
+                'completed'
             ])->default('pending');
-
             // Timestamps
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('payment_completed_at')->nullable();
             $table->timestamp('start_time')->nullable();
             $table->timestamp('end_time')->nullable();
-
             // Payment
             $table->enum('payment_status', ['unpaid', 'advancePaid', 'refunded', 'fullyPaid'])
                 ->default('unpaid');
-
             $table->boolean('is_synced_with_calendar')->default(false);
-
             $table->softDeletes();
             $table->timestamps();
-
-            // Indexes
-            $table->index('host_id');
-            $table->index('business_id');
-            $table->index('custom_booking_id');
-            $table->index('status');
         });
     }
 

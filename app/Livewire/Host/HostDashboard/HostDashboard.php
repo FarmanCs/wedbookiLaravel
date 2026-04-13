@@ -53,20 +53,40 @@ class HostDashboard extends Component
     public array $countdown = ['days' => 0, 'hours' => 0, 'minutes' => 0, 'seconds' => 0];
     public bool $showDateModal = false;
 
+    // Event timing details
+    public $eventDate;
+    public $eventStartTime;
+    public $eventEndTime;
+    public $eventVenue;
+    public string $eventTimingMessage = '';
+
     /**
-     * Open the date picker modal
+     * Open the event timing modal
      */
-    public function openDateModal()
+    public function openEventTimingModal()
     {
         $this->showDateModal = true;
+        $this->loadEventTimingDetails();
     }
 
     /**
-     * Close the date picker modal
+     * Close the event timing modal
      */
     public function closeDateModal()
     {
         $this->showDateModal = false;
+        $this->eventTimingMessage = '';
+    }
+
+    /**
+     * Load event timing details from host record
+     */
+    private function loadEventTimingDetails(): void
+    {
+        $this->eventDate = $this->host->wedding_date;
+        $this->eventStartTime = $this->host->event_start_time ?? '10:00';
+        $this->eventEndTime = $this->host->event_end_time ?? '23:00';
+        $this->eventVenue = $this->host->event_venue ?? '';
     }
 
     /**
@@ -86,10 +106,57 @@ class HostDashboard extends Component
         $this->host->wedding_date = $date;
         $this->host->save();
         $this->weddingDate = $date;
+        $this->eventDate = $date;
         $this->updateCountdown();
         $this->showDateModal = false;
         $this->dispatch('date-set');
         $this->dispatch('success', message: 'Wedding date has been updated successfully!');
+    }
+
+    /**
+     * Save event timing details (date, time, venue)
+     */
+    public function saveEventTiming($date, $startTime, $endTime)
+    {
+        try {
+            // Validate that the date is not in the past
+            $selectedDate = Carbon::parse($date)->startOfDay();
+            $today = Carbon::now()->startOfDay();
+
+            if ($selectedDate < $today) {
+                $this->dispatch('error', message: 'Please select a date that is today or in the future.');
+                return;
+            }
+
+            // Validate times
+            $startDateTime = Carbon::createFromFormat('H:i', $startTime);
+            $endDateTime = Carbon::createFromFormat('H:i', $endTime);
+
+            if ($endDateTime <= $startDateTime) {
+                $this->dispatch('error', message: 'Event end time must be after start time.');
+                return;
+            }
+
+            // Update host record
+            $this->host->update([
+                'wedding_date' => $date,
+                'event_start_time' => $startTime,
+                'event_end_time' => $endTime,
+            ]);
+
+            // Update local properties
+            $this->weddingDate = $date;
+            $this->eventDate = $date;
+            $this->eventStartTime = $startTime;
+            $this->eventEndTime = $endTime;
+
+            $this->updateCountdown();
+            $this->showDateModal = false;
+
+            $this->dispatch('success', message: 'Event timing has been saved successfully!');
+        } catch (\Exception $e) {
+            $this->dispatch('error', message: 'An error occurred: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -185,13 +252,15 @@ class HostDashboard extends Component
     {
         // Placeholder tasks – replace with actual checklist data
         $this->checklistTasks = [
-            ['title' => 'Process Advance Payment', 'due' => 'November 26', 'type' => 'Payment', 'description' => 'Pay your advance of 250 by 26 Nov 2025 to confirm your booking.'],
-            ['title' => 'Pay Final Payment', 'due' => 'December 17', 'type' => 'Payment', 'description' => 'Complete your remaining payment of 2250 by 17 Dec 2025 to keep your booking confirmed.'],
-            ['title' => 'Confirm Menu with Caterer', 'due' => 'December 10', 'type' => 'Vendor', 'description' => 'Finalize the menu selections for the wedding reception.'],
+            ['title' => 'Process Advance Payment', 'due' => 'November 26', 'type' => 'Payment'],
+            ['title' => 'Pay Final Payment', 'due' => 'December 17', 'type' => 'Payment'],
+            ['title' => 'Confirm Menu with Caterer', 'due' => 'December 10', 'type' => 'Vendor'],
+            ['title' => 'Finalize Guest List', 'due' => 'December 5', 'type' => 'Guests'],
+            ['title' => 'Arrange Transportation', 'due' => 'December 12', 'type' => 'Logistics'],
         ];
-        $this->doneTasks = 2; // from DB count
-        $this->totalTasks = 61; // from DB count
-        $this->overdueTasks = 52; // from DB count
+        $this->doneTasks = 2;
+        $this->totalTasks = 20;
+        $this->overdueTasks = 1;
     }
 
     /**
@@ -201,6 +270,8 @@ class HostDashboard extends Component
     {
         $this->host = Auth::guard('host')->user();
         $this->weddingDate = $this->host->wedding_date;
+        $this->eventStartTime = $this->host->event_start_time ?? '10:00';
+        $this->eventEndTime = $this->host->event_end_time ?? '23:00';
         $this->updateCountdown();
         $this->loadDashboardData();
     }
@@ -277,19 +348,16 @@ class HostDashboard extends Component
     {
         $query = Booking::where('host_id', $this->host->id);
 
-        // Apply status filter
         if ($this->statusFilter !== 'all') {
             $query->where('status', $this->statusFilter);
         }
 
-        // Apply search
         if (!empty($this->vendorSearch)) {
             $query->whereHas('business', function ($q) {
                 $q->where('company_name', 'like', '%' . $this->vendorSearch . '%');
             });
         }
 
-        // Apply sorting
         switch ($this->sortBy) {
             case 'oldest':
                 $query->orderBy('created_at', 'asc');
@@ -382,11 +450,10 @@ class HostDashboard extends Component
     }
 
     /**
-     * Load recent activity (bookings, groups, RSVP updates)
+     * Load recent activity
      */
     private function loadRecentActivity(): void
     {
-        // Recent booking status changes
         $recentBookings = Booking::where('host_id', $this->host->id)
             ->orderBy('updated_at', 'desc')
             ->limit(5)
@@ -407,7 +474,6 @@ class HostDashboard extends Component
                 ];
             });
 
-        // Recent guest groups created
         $recentGroups = GuestGroup::where('host_id', $this->host->id)
             ->orderBy('created_at', 'desc')
             ->limit(3)
@@ -420,14 +486,9 @@ class HostDashboard extends Component
                 ];
             });
 
-        // Combine and sort by time
         $this->recentActivity = collect()
             ->merge($recentBookings)
             ->merge($recentGroups)
-            ->sortByDesc(function ($item) {
-                // Parse the diffForHumans string to get actual time for sorting
-                return strtotime('-' . preg_replace('/[^0-9]/', '', $item['time']) . ' seconds');
-            })
             ->values()
             ->take(8)
             ->toArray();
@@ -438,7 +499,6 @@ class HostDashboard extends Component
      */
     private function loadPackages(): void
     {
-        // Get packages from confirmed vendor businesses
         $confirmedBusinessIds = Booking::where('host_id', $this->host->id)
             ->where('status', 'confirmed')
             ->distinct('business_id')
@@ -540,6 +600,8 @@ class HostDashboard extends Component
             'guestGroups' => $this->guestGroups,
             'recentActivity' => $this->recentActivity,
             'packages' => $this->packages,
+            'eventStartTime' => $this->eventStartTime,
+            'eventEndTime' => $this->eventEndTime,
         ]);
     }
 }
