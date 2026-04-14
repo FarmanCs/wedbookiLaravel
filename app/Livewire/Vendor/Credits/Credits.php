@@ -5,6 +5,7 @@ namespace App\Livewire\Vendor\Credits;
 use App\Models\Subscription\CreditPlan;
 use App\Models\Subscription\CreditsTransaction;
 use App\Models\Business\Business;
+use App\Models\Vendor\VendorPurchase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
@@ -185,6 +186,27 @@ class Credits extends Component
                     'credits' => (string)$plan->no_of_credits,
                 ],
             ]);
+
+            VendorPurchase::updateOrCreate(
+                ['stripe_session_id' => $session->id],
+                [
+                    'vendor_id' => $vendor->id,
+                    'business_id' => $business->id,
+                    'cart_items' => json_encode([
+                        [
+                            'type' => 'credit',
+                            'id' => $plan->id,
+                            'name' => $plan->name,
+                            'credits' => $plan->no_of_credits,
+                            'price' => $finalPrice,
+                            'quantity' => 1,
+                        ],
+                    ]),
+                    'total_amount' => $finalPrice,
+                    'payment_intent_id' => null,
+                    'status' => 'pending',
+                ]
+            );
 
             $this->dispatch('stripe-redirect', url: $session->url);
         } catch (\Exception $e) {

@@ -11,6 +11,7 @@ use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 use \App\Livewire\Host\Auth\HostSignup;
 use App\Livewire\Host\Bookings\BookingComponent;
+use App\Livewire\Vendor\Bookings\VendorBookingComponent;
 use App\Livewire\Vendor\Business\CreateEditBusiness;
 use App\Livewire\Vendor\Business\VendorBusiness;
 use App\Livewire\Vendor\Packages\Packages;
@@ -51,7 +52,7 @@ Route::prefix('vendor')->name('vendor.')->group(function () {
         Route::get('/storefront', \App\Livewire\Vendor\Storefront\Index::class)->name('storefront');
         Route::get('/payments', \App\Livewire\Vendor\Payments\Index::class)->name('payments');
         Route::get('/reviews', \App\Livewire\Vendor\Reviews\Index::class)->name('reviews');
-        Route::get('/bookings', \App\Livewire\Vendor\Bookings\Index::class)->name('bookings');
+        Route::get('/bookings', VendorBookingComponent::class)->name('bookings');
         Route::get('/analytics', \App\Livewire\Vendor\Analytics\Index::class)->name('analytics');
 
         // ✅ CREDITS — declared AFTER credits/success

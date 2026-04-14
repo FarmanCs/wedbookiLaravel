@@ -20,7 +20,10 @@ class PlanTransaction extends Model
         'start_at',
         'end_at',
         'amount',
-        'transaction_type'
+        'transaction_type',
+        'stripe_session_id',
+        'payment_intent_id',
+        'status',
     ];
 
     protected $casts = [
@@ -28,6 +31,7 @@ class PlanTransaction extends Model
         'start_at' => 'datetime',
         'end_at' => 'datetime',
         'amount' => 'decimal:2',
+        'status' => 'string',
     ];
 
     public function business()
