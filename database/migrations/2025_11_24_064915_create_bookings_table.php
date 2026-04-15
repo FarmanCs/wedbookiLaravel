@@ -16,11 +16,10 @@ return new class extends Migration
             $table->foreignId('vendor_id')->nullable()->constrained('vendors')->nullOnDelete();
             $table->foreignId('venue_id')->constrained('venues')->cascadeOnDelete();
             $table->foreignId('package_id')->nullable()->constrained('packages')->nullOnDelete();
-            $table->date('event_date');
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->integer('guest_count')->default(0);
-            $table->decimal('total_amount', 10, 2);
+            $table->decimal('total_amount', 10, 2)->default(0.00);
             $table->string('stripe_payment_intent_id')->nullable();
             $table->string('stripe_session_id')->nullable();
             // Unique booking ID
@@ -53,8 +52,6 @@ return new class extends Migration
             // Timestamps
             $table->timestamp('approved_at')->nullable();
             $table->timestamp('payment_completed_at')->nullable();
-            $table->timestamp('start_time')->nullable();
-            $table->timestamp('end_time')->nullable();
             // Payment
             $table->enum('payment_status', ['unpaid', 'advancePaid', 'refunded', 'fullyPaid'])
                 ->default('unpaid');

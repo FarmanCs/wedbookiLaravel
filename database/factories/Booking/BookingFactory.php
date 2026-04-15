@@ -7,6 +7,7 @@ use App\Models\Host\Host;
 use App\Models\Business\Business;
 use App\Models\Vendor\Vendor;
 use App\Models\Business\Package;
+use App\Models\Business\Venue;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class BookingFactory extends Factory
@@ -19,6 +20,7 @@ class BookingFactory extends Factory
             'host_id' => Host::factory(),
             'business_id' => Business::factory(),
             'vendor_id' => Vendor::factory(),
+            'venue_id' => Venue::factory(),
             'package_id' => Package::factory(),
             'custom_booking_id' => $this->faker->unique()->uuid,
             'amount' => $this->faker->randomFloat(2, 100, 10000),

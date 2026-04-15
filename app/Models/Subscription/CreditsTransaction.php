@@ -15,9 +15,11 @@ class CreditsTransaction extends Model
 
     protected $fillable = [
         'business_id',
-        'credit_plan_id',
+        'vendor_id',
+        'credit_id',
         'no_of_credits',
         'amount',
+        'ad_credits',
         'stripe_session_id',
         'payment_intent_id',
         'status',
@@ -38,8 +40,8 @@ class CreditsTransaction extends Model
         return $this->belongsTo(Business::class);
     }
 
-    public function creditPlan()
+    public function credit()
     {
-        return $this->belongsTo(CreditPlan::class);
+        return $this->belongsTo(Credits::class, 'credit_id');
     }
 }

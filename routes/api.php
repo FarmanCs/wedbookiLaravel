@@ -15,9 +15,10 @@ use App\Http\Controllers\Host\GoogleCalendarController;
 use App\Http\Controllers\Host\AccountController;
 use App\Http\Controllers\Vendor\VendorController;
 use App\Http\Controllers\Admin\AdminController;
-use  App\Http\Controllers\Subscription\SubscriptionController;
 
+use App\Http\Controllers\Subscription\SubscriptionController;
 use App\Http\Controllers\StripeWebhookController;
+
 
 Route::post('/stripe/webhook', StripeWebhookController::class);
 

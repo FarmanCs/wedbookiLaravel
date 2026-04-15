@@ -6,12 +6,11 @@ use App\Filament\Resources\CreditPlans\Pages\CreateCreditPlan;
 use App\Filament\Resources\CreditPlans\Pages\EditCreditPlan;
 use App\Filament\Resources\CreditPlans\Pages\ListCreditPlans;
 use App\Filament\Resources\CreditPlans\Pages\ViewCreditPlan;
-use App\Filament\Resources\CreditPlans\RelationManagers\CreditTransectionsRelationManager;
 use App\Filament\Resources\CreditPlans\Schemas\CreditPlanForm;
 use App\Filament\Resources\CreditPlans\Schemas\CreditPlanInfolist;
 use App\Filament\Resources\CreditPlans\Tables\CreditPlansTable;
 use App\Filament\Resources\CreditPlans\Widgets\CreditTransactionsTable;
-use App\Models\Subscription\CreditPlan;
+use App\Models\Subscription\Credits;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -23,7 +22,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CreditPlanResource extends Resource
 {
-    protected static ?string $model = CreditPlan::class;
+    protected static ?string $model = Credits::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 

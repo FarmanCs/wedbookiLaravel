@@ -3,7 +3,7 @@
 namespace App\Livewire\Vendor\Credits;
 
 use App\Models\Subscription\Plan;
-use App\Models\Subscription\CreditPlan;
+use App\Models\Subscription\Credits;
 use App\Models\Subscription\PlanTransaction;
 use App\Models\Subscription\Subscription;
 use App\Models\Business\Business;
@@ -28,7 +28,7 @@ class Plans extends Component
     public $selectedBusinessId        = null;
 
     // ── Ad credits state ──────────────────────────────────────────────────────
-    public $creditPlans                  = [];
+    public $credits                  = [];
     public $selectedCreditPlan           = null;
     public bool $showCreditConfirmModal  = false;
     public $selectedBusinessIdForCredits = null;
@@ -57,7 +57,7 @@ class Plans extends Component
     {
         $this->loadBusinesses();
         $this->loadSubscriptionPlans();
-        $this->loadCreditPlans();
+        $this->loadcredits();
         $this->selectedBusinessIdForCart = $this->businesses->isNotEmpty() ? $this->businesses->first()->id : null;
     }
 
@@ -72,9 +72,9 @@ class Plans extends Component
         $this->plans = Plan::with('features')->orderBy('monthly_price')->get();
     }
 
-    public function loadCreditPlans(): void
+    public function loadcredits(): void
     {
-        $this->creditPlans = CreditPlan::orderBy('price')->get();
+        $this->credits = Credits::orderBy('price')->get();
     }
 
     // ── Subscription plan flow ────────────────────────────────────────────────
@@ -136,79 +136,19 @@ class Plans extends Component
         // Do NOT create Subscription or PlanTransaction here
         // Wait for Stripe webhook confirmation for ACID safety
 
-        $this->processingPayment = true;
+        $this->cart = [
+            [
+                'type' => 'plan',
+                'id' => $this->selectedPlan->id,
+                'name' => $this->selectedPlan->name,
+                'cycle' => $this->selectedCycle,
+                'price' => $this->selectedPrice,
+            ]
+        ];
 
-        try {
-            Stripe::setApiKey(config('services.stripe.secret'));
+        $this->selectedBusinessIdForCart = $this->selectedBusinessId;
 
-            $unitAmountCents = (int) round($this->selectedPrice * 100);
-
-            Log::info('[Stripe] Creating checkout session for plan', [
-                'vendor_id'   => $vendor->id,
-                'business_id' => $business->id,
-                'plan_id'     => $this->selectedPlan->id,
-                'cycle'       => $this->selectedCycle,
-                'amount'      => $this->selectedPrice,
-            ]);
-
-            $successUrl = route('vendor.credits.success') . '?session_id={CHECKOUT_SESSION_ID}';
-            $cancelUrl  = route('vendor.credits');
-
-            $session = Session::create([
-                'payment_method_types' => ['card'],
-                'line_items' => [[
-                    'price_data' => [
-                        'currency'     => config('services.stripe.currency', 'usd'),
-                        'product_data' => [
-                            'name'        => $this->selectedPlan->name . ' — ' . ucfirst($this->selectedCycle) . ' Plan',
-                            'description' => $this->selectedPlan->description ?? 'Subscription plan',
-                        ],
-                        'unit_amount' => $unitAmountCents,
-                    ],
-                    'quantity' => 1,
-                ]],
-                'mode'        => 'payment',
-                'success_url' => $successUrl,
-                'cancel_url'  => $cancelUrl,
-                'metadata'    => [
-                    'vendor_id'      => (string) $vendor->id,
-                    'business_id'    => (string) $business->id,
-                    'plan_id'        => (string) $this->selectedPlan->id,
-                    'cycle'          => $this->selectedCycle,
-                    'amount'         => (string) $this->selectedPrice,
-                    'type'           => 'plan',
-                ],
-            ]);
-
-            Log::info('[Stripe] Session created: ' . $session->id);
-
-            $this->dispatch('stripe-redirect', url: $session->url);
-        } catch (\Stripe\Exception\AuthenticationException $e) {
-            Log::error('[Stripe] Auth failed — wrong STRIPE_SECRET_KEY: ' . $e->getMessage());
-            session()->flash('error', 'Payment authentication failed. Contact support.');
-            $this->cancelPlanConfirm();
-        } catch (\Stripe\Exception\InvalidRequestException $e) {
-            Log::error('[Stripe] Invalid request: ' . $e->getMessage(), ['body' => $e->getJsonBody()]);
-            session()->flash('error', 'Invalid payment request: ' . $e->getMessage());
-            $this->cancelPlanConfirm();
-        } catch (\Stripe\Exception\ApiConnectionException $e) {
-            Log::error('[Stripe] Network error: ' . $e->getMessage());
-            session()->flash('error', 'Could not connect to payment gateway. Please try again.');
-            $this->cancelPlanConfirm();
-        } catch (\Stripe\Exception\ApiErrorException $e) {
-            Log::error('[Stripe] API error: ' . $e->getMessage(), ['body' => $e->getJsonBody()]);
-            session()->flash('error', 'Payment error: ' . $e->getMessage());
-            $this->cancelPlanConfirm();
-        } catch (\Exception $e) {
-            Log::error('[Stripe] Unexpected: ' . $e->getMessage(), [
-                'class' => get_class($e),
-                'file'  => $e->getFile() . ':' . $e->getLine(),
-            ]);
-            session()->flash('error', 'Unexpected error: ' . $e->getMessage());
-            $this->cancelPlanConfirm();
-        } finally {
-            $this->processingPayment = false;
-        }
+        $this->checkout();
     }
 
     private function resolveEndDate(string $cycle): \Carbon\Carbon
@@ -225,7 +165,7 @@ class Plans extends Component
 
     public function buyCreditPlan(int $planId): void
     {
-        $plan = CreditPlan::find($planId);
+        $plan = Credits::find($planId);
 
         if (! $plan) {
             session()->flash('error', 'Ad credits plan not found.');
@@ -288,89 +228,20 @@ class Plans extends Component
             return;
         }
 
-        $stripeSecret = config('services.stripe.secret');
+        $this->cart = [
+            [
+                'type' => 'credit',
+                'id' => $plan->id,
+                'name' => $plan->name,
+                'quantity' => 1,
+                'price' => $finalPrice,
+                'credits' => $plan->no_of_credits,
+            ]
+        ];
 
-        if (empty($stripeSecret)) {
-            Log::error('[Stripe] Secret key is empty. Run: php artisan config:clear');
-            session()->flash('error', 'Payment gateway is not configured. Contact support.');
-            $this->cancelCreditConfirm();
-            return;
-        }
+        $this->selectedBusinessIdForCart = $this->selectedBusinessIdForCredits;
 
-        $this->processingPayment = true;
-
-        try {
-            Stripe::setApiKey($stripeSecret);
-
-            $unitAmountCents = (int) round($finalPrice * 100);
-
-            Log::info('[Stripe] Creating checkout session', [
-                'vendor_id'   => $vendor->id,
-                'business_id' => $business->id,
-                'plan_id'     => $plan->id,
-                'credits'     => $plan->no_of_credits,
-                'cents'       => $unitAmountCents,
-            ]);
-
-            // ✅ Use route() directly — it returns an absolute URL already.
-            $successUrl = route('vendor.credits.success') . '?session_id={CHECKOUT_SESSION_ID}';
-            $cancelUrl  = route('vendor.credits');
-
-            // Log::info('[Stripe] success_url: ' . $successUrl);
-            // Log::info('[Stripe] cancel_url: '  . $cancelUrl);
-
-            $session = Session::create([
-                'payment_method_types' => ['card'],
-                'line_items' => [[
-                    'price_data' => [
-                        'currency'     => config('services.stripe.currency', 'usd'),
-                        'product_data' => [
-                            'name'        => $plan->name . ' — ' . $plan->no_of_credits . ' Ad Credits',
-                            'description' => $plan->description ?? 'Ad credits for your business',
-                        ],
-                        'unit_amount' => $unitAmountCents,
-                    ],
-                    'quantity' => 1,
-                ]],
-                'mode'        => 'payment',
-                'success_url' => $successUrl,
-                'cancel_url'  => $cancelUrl,
-                'metadata'    => [
-                    'vendor_id'      => (string) $vendor->id,
-                    'business_id'    => (string) $business->id,
-                    'credit_plan_id' => (string) $plan->id,
-                    'credits'        => (string) $plan->no_of_credits,
-                ],
-            ]);
-
-            Log::info('[Stripe] Session created: ' . $session->id);
-
-            // Dispatch Alpine event to trigger window.location.href = stripe URL
-            $this->dispatch('stripe-redirect', url: $session->url);
-        } catch (\Stripe\Exception\AuthenticationException $e) {
-            Log::error('[Stripe] Auth failed — wrong STRIPE_SECRET_KEY: ' . $e->getMessage());
-            session()->flash('error', 'Payment authentication failed. Contact support.');
-            $this->cancelCreditConfirm();
-        } catch (\Stripe\Exception\InvalidRequestException $e) {
-            Log::error('[Stripe] Invalid request: ' . $e->getMessage(), ['body' => $e->getJsonBody()]);
-            session()->flash('error', 'Invalid payment request: ' . $e->getMessage());
-            $this->cancelCreditConfirm();
-        } catch (\Stripe\Exception\ApiConnectionException $e) {
-            Log::error('[Stripe] Network error: ' . $e->getMessage());
-            session()->flash('error', 'Could not connect to payment gateway. Please try again.');
-            $this->cancelCreditConfirm();
-        } catch (\Stripe\Exception\ApiErrorException $e) {
-            Log::error('[Stripe] API error: ' . $e->getMessage(), ['body' => $e->getJsonBody()]);
-            session()->flash('error', 'Payment error: ' . $e->getMessage());
-            $this->cancelCreditConfirm();
-        } catch (\Exception $e) {
-            Log::error('[Stripe] Unexpected: ' . $e->getMessage(), [
-                'class' => get_class($e),
-                'file'  => $e->getFile() . ':' . $e->getLine(),
-            ]);
-            session()->flash('error', 'Unexpected error: ' . $e->getMessage());
-            $this->cancelCreditConfirm();
-        }
+        $this->checkout();
     }
 
     // ── Cart methods ─────────────────────────────────────────────────────────
@@ -378,7 +249,7 @@ class Plans extends Component
     public function addToCart($type, $id, $cycle = null)
     {
         if ($type === 'credit') {
-            $plan = collect($this->creditPlans)->firstWhere('id', $id);
+            $plan = collect($this->credits)->firstWhere('id', $id);
             if (!$plan) return;
 
             $price = $plan->price;
@@ -544,7 +415,7 @@ class Plans extends Component
     public function openPurchaseModal($type, $id, $cycle = null)
     {
         if ($type === 'credit') {
-            $plan = collect($this->creditPlans)->firstWhere('id', $id);
+            $plan = collect($this->credits)->firstWhere('id', $id);
             if (!$plan) return;
 
             $price = $plan->price;
@@ -614,7 +485,7 @@ class Plans extends Component
 
     public function addCreditToPurchase($id)
     {
-        $plan = collect($this->creditPlans)->firstWhere('id', $id);
+        $plan = collect($this->credits)->firstWhere('id', $id);
         if (!$plan) return;
 
         $price = $plan->price;
@@ -811,7 +682,7 @@ class Plans extends Component
     {
         return view('livewire.vendor.credits.plans', [
             'plans'       => $this->plans,
-            'creditPlans' => $this->creditPlans,
+            'credits' => $this->credits,
         ]);
     }
 }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Database\Seeders\Admin\PermissionSeeder;
 use Database\Seeders\Admin\RoleSeeder;
+use Database\Seeders\Subscription\CreditSeeder;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -61,7 +62,7 @@ class DatabaseSeeder extends Seeder
 
             // Subscriptions & Plans
             \Database\Seeders\Subscription\PlanSeeder::class,
-            \Database\Seeders\Subscription\CreditPlanSeeder::class,
+            CreditSeeder::class,
 
             // Many-to-many feature relationships
             \Database\Seeders\Feature\FeaturePackageSeeder::class,

@@ -28,6 +28,9 @@ return new class extends Migration
 
             $table->decimal('amount', 10, 2)->default(0);
 
+            $table->string('stripe_session_id')->nullable()->unique();
+            $table->string('payment_intent_id')->nullable();
+            $table->enum('status', ['pending', 'completed', 'failed', 'refunded'])->default('pending');
             $table->enum('transaction_type', [
                 'purchase',
                 'renewal'

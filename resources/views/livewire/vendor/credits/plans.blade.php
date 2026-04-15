@@ -7,10 +7,7 @@
     </div>
 
     {{-- ── Stripe redirect handler ── --}}
-    {{-- This is the KEY fix: Livewire cannot redirect to external URLs like Stripe. --}}
-    {{-- We listen for the 'stripe-redirect' event dispatched from the component --}}
-    {{-- and do a plain window.location redirect instead. --}}
-    <div x-data="{}" x-on:stripe-redirect.window="window.location.href = $event.detail.url"></div>
+    <div x-data="{}" @stripe-redirect.window="window.location.href = $event.detail.url"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 relative z-10">
 
@@ -63,7 +60,7 @@
                     :class="cycle === 'quarterly' ? 'bg-indigo-600 text-white shadow-lg' :
                         'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300'"
                     class="px-6 py-2 rounded-full font-semibold transition-all duration-200">
-                    Quarterly <span class="text-xs font-bold text-green-500">5%</span>
+                    Quarterly <span class="text-xs font-bold text-green-500">-5%</span>
                 </button>
                 <button @click="cycle = 'annually'"
                     :class="cycle === 'annually' ? 'bg-indigo-600 text-white shadow-lg' :
@@ -76,9 +73,9 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
                 @foreach ($plans as $plan)
                     @php
-                        $finalMonthly = $plan->monthly_price;
-                        $finalQuarterly = ($plan->quarterly_price * 95) / 100;
-                        $finalAnnual = ($plan->yearly_price * 90) / 100;
+                        $finalMonthly = (float) $plan->monthly_price;
+                        $finalQuarterly = round(($plan->quarterly_price * 95) / 100, 2);
+                        $finalAnnual = round(($plan->yearly_price * 90) / 100, 2);
                     @endphp
                     <div
                         class="group relative bg-white dark:bg-zinc-800/50 rounded-2xl shadow-lg border border-gray-200 dark:border-zinc-700 hover:shadow-2xl hover:shadow-indigo-500/20 transition-all duration-300 overflow-hidden flex flex-col">
@@ -121,7 +118,7 @@
                                         x-text="cycle === 'monthly' ? 'Monthly billing' : (cycle === 'quarterly' ? 'Quarterly billing' : 'Annual billing')"></span>
                                 </p>
                             </div>
-                            <button x-on:click="$wire.openPurchaseModal('plan', {{ $plan->id }}, cycle)"
+                            <button @click="$wire.openPurchaseModal('plan', {{ $plan->id }}, cycle)"
                                 class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold shadow-md transition-all flex items-center justify-center gap-2">
                                 <flux:icon.shopping-cart class="w-5 h-5" />
                                 Buy Now
@@ -190,12 +187,12 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @foreach ($creditPlans as $plan)
+                @foreach ($credits as $plan)
                     @php
-                        $finalPrice = $plan->price;
+                        $finalPrice = (float) $plan->price;
                         $discount = $plan->discounted_percentage;
-                        if ($discount) {
-                            $finalPrice = ($plan->price * (100 - $discount)) / 100;
+                        if ($discount > 0) {
+                            $finalPrice = round(($plan->price * (100 - $discount)) / 100, 2);
                         }
                     @endphp
                     <div
@@ -217,7 +214,7 @@
                                     <span class="text-3xl font-black text-amber-600 dark:text-amber-400">
                                         Rs {{ number_format($finalPrice, 2) }}
                                     </span>
-                                    @if ($discount)
+                                    @if ($discount > 0)
                                         <span class="text-sm line-through text-gray-400">Rs
                                             {{ number_format($plan->price, 2) }}</span>
                                         <span
@@ -230,7 +227,7 @@
                                     {{ $plan->no_of_credits }} Credits
                                 </p>
                             </div>
-                            <button wire:click="openPurchaseModal('credit', {{ $plan->id }})"
+                            <button @click="$wire.openPurchaseModal('credit', {{ $plan->id }})"
                                 class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 text-white font-semibold shadow-md transition-all flex items-center justify-center gap-2">
                                 <flux:icon.shopping-cart class="w-5 h-5" />
                                 Buy Now
@@ -252,7 +249,7 @@
         <div
             class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-[60] animate-fade-in">
             <div
-                class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-lg w-full border border-white/20 dark:border-zinc-800 animate-scale-up">
+                class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-lg w-full border border-white/20 dark:border-zinc-800 animate-scale-up max-h-[90vh] overflow-y-auto">
                 <div class="p-6">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Purchase Details</h3>
 
@@ -265,7 +262,7 @@
                             <div class="flex items-center gap-2 mt-2">
                                 <button wire:click="updateSelectedQuantity({{ $selectedQuantity - 1 }})"
                                     class="w-8 h-8 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-600 flex items-center justify-center"
-                                    {{ $selectedQuantity <= 1 ? 'disabled' : '' }}>-</button>
+                                    {{ $selectedQuantity <= 1 ? 'disabled' : '' }}>−</button>
                                 <span class="text-sm font-medium">{{ $selectedQuantity }}</span>
                                 <button wire:click="updateSelectedQuantity({{ $selectedQuantity + 1 }})"
                                     class="w-8 h-8 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-600 flex items-center justify-center">+</button>
@@ -284,11 +281,11 @@
 
                     {{-- Add Plan for Credit --}}
                     @if ($selectedItem['type'] === 'credit')
-                        <div class="mb-4">
+                        <div class="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                             <h5 class="font-semibold text-gray-900 dark:text-white mb-2">Add a Plan (Optional)</h5>
                             @if ($selectedPlanForPurchase)
                                 <div
-                                    class="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg flex justify-between items-center">
+                                    class="p-3 bg-indigo-100 dark:bg-indigo-900/40 rounded-lg flex justify-between items-center">
                                     <div>
                                         <p class="font-medium text-indigo-900 dark:text-indigo-200">
                                             {{ $selectedPlanForPurchase['name'] }}</p>
@@ -297,18 +294,12 @@
                                             {{ number_format($selectedPlanForPurchase['price'], 2) }}</p>
                                     </div>
                                     <button wire:click="removePlanForPurchase"
-                                        class="text-red-500 hover:text-red-700">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                                        class="text-red-500 hover:text-red-700 font-bold">×</button>
                                 </div>
                             @else
                                 <div class="space-y-2">
                                     <select wire:model="tempPlanId"
-                                        class="w-full p-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700">
+                                        class="w-full p-2 border border-gray-300 rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
                                         <option value="">Select a plan</option>
                                         @foreach ($plans as $plan)
                                             <option value="{{ $plan->id }}">{{ $plan->name }}</option>
@@ -316,20 +307,14 @@
                                     </select>
                                     <div class="flex gap-2">
                                         <button wire:click="$set('tempCycle', 'monthly')"
-                                            :class="$wire.tempCycle === 'monthly' ? 'bg-indigo-600 text-white' :
-                                                'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300'"
-                                            class="px-3 py-1 rounded text-sm">Monthly</button>
+                                            class="px-3 py-1 rounded text-sm {{ $tempCycle === 'monthly' ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300' }}">Monthly</button>
                                         <button wire:click="$set('tempCycle', 'quarterly')"
-                                            :class="$wire.tempCycle === 'quarterly' ? 'bg-indigo-600 text-white' :
-                                                'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300'"
-                                            class="px-3 py-1 rounded text-sm">Quarterly</button>
+                                            class="px-3 py-1 rounded text-sm {{ $tempCycle === 'quarterly' ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300' }}">Quarterly</button>
                                         <button wire:click="$set('tempCycle', 'annually')"
-                                            :class="$wire.tempCycle === 'annually' ? 'bg-indigo-600 text-white' :
-                                                'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300'"
-                                            class="px-3 py-1 rounded text-sm">Annual</button>
+                                            class="px-3 py-1 rounded text-sm {{ $tempCycle === 'annually' ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300' }}">Annual</button>
                                     </div>
                                     <button wire:click="selectPlanForPurchase(tempPlanId, tempCycle)"
-                                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Add
+                                        class="w-full px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Add
                                         Plan</button>
                                 </div>
                             @endif
@@ -338,13 +323,13 @@
 
                     {{-- Add Credits for Plan --}}
                     @if ($selectedItem['type'] === 'plan')
-                        <div class="mb-4">
+                        <div class="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                             <h5 class="font-semibold text-gray-900 dark:text-white mb-2">Add Credits (Optional)</h5>
                             @if (!empty($selectedCreditsForPurchase))
-                                <div class="space-y-2">
+                                <div class="space-y-2 mb-3">
                                     @foreach ($selectedCreditsForPurchase as $index => $credit)
                                         <div
-                                            class="p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg flex justify-between items-center">
+                                            class="p-3 bg-amber-100 dark:bg-amber-900/40 rounded-lg flex justify-between items-center">
                                             <div>
                                                 <p class="font-medium text-amber-900 dark:text-amber-200">
                                                     {{ $credit['name'] }}</p>
@@ -352,7 +337,7 @@
                                                     <button
                                                         wire:click="updateCreditQuantity({{ $index }}, {{ $credit['quantity'] - 1 }})"
                                                         class="w-6 h-6 rounded-full bg-gray-200 dark:bg-zinc-700 text-gray-700 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-zinc-600 flex items-center justify-center text-sm"
-                                                        {{ $credit['quantity'] <= 1 ? 'disabled' : '' }}>-</button>
+                                                        {{ $credit['quantity'] <= 1 ? 'disabled' : '' }}>−</button>
                                                     <span class="text-sm">{{ $credit['quantity'] }}</span>
                                                     <button
                                                         wire:click="updateCreditQuantity({{ $index }}, {{ $credit['quantity'] + 1 }})"
@@ -362,34 +347,29 @@
                                                 </div>
                                             </div>
                                             <button wire:click="updateCreditQuantity({{ $index }}, 0)"
-                                                class="text-red-500 hover:text-red-700">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
+                                                class="text-red-500 hover:text-red-700 font-bold">×</button>
                                         </div>
                                     @endforeach
                                 </div>
                             @endif
-                            <div class="mt-2">
+                            <div>
                                 <select wire:model="tempCreditId"
-                                    class="w-full p-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700">
+                                    class="w-full p-2 border border-gray-300 rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
                                     <option value="">Select credits to add</option>
-                                    @foreach ($creditPlans as $plan)
-                                        <option value="{{ $plan->id }}">{{ $plan->name }}</option>
+                                    @foreach ($credits as $credit)
+                                        <option value="{{ $credit->id }}">{{ $credit->name }}</option>
                                     @endforeach
                                 </select>
-                                <button wire:click="addCreditToPurchase($wire.tempCreditId)"
-                                    class="mt-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700">Add
+                                <button wire:click="addCreditToPurchase(tempCreditId)"
+                                    class="mt-2 w-full px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">Add
                                     Credits</button>
                             </div>
                         </div>
                     @endif
 
                     {{-- Total --}}
-                    <div class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <div
+                        class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-900">
                         <p class="text-lg font-bold text-green-900 dark:text-green-200">Total: Rs
                             {{ number_format($this->getPurchaseTotalProperty(), 2) }}</p>
                     </div>
@@ -397,23 +377,23 @@
                     {{-- Business Selection --}}
                     <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Select
-                            Business</label>
+                            Business <span class="text-red-500">*</span></label>
                         <select wire:model="selectedBusinessIdForCart"
-                            class="w-full p-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700">
+                            class="w-full p-2 border border-gray-300 rounded-lg dark:bg-zinc-800 dark:border-zinc-700 dark:text-white">
                             <option value="">-- Select a business --</option>
                             @foreach ($businesses as $business)
                                 <option value="{{ $business->id }}">{{ $business->company_name }}</option>
                             @endforeach
                         </select>
                         @error('selectedBusinessIdForCart')
-                            <span class="text-red-500 text-xs">{{ $message }}</span>
+                            <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span>
                         @enderror
                     </div>
 
                     {{-- Buttons --}}
                     <div class="flex justify-end gap-3">
                         <button wire:click="closePurchaseModal"
-                            class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-zinc-600 transition">Cancel</button>
+                            class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-zinc-600 transition font-medium">Cancel</button>
                         <button wire:click="proceedToPayment" wire:loading.attr="disabled"
                             class="px-6 py-2 rounded-xl bg-gradient-to-r from-green-600 to-blue-600 text-white font-semibold shadow-md hover:shadow-lg transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
                             <span wire:loading.remove>
@@ -432,143 +412,6 @@
                             </span>
                         </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    {{-- ── Confirmation Modal: Subscription Plan ── --}}
-    @if (isset($showPlanConfirmModal) && $showPlanConfirmModal && isset($selectedPlan) && $selectedPlan)
-        <div
-            class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-[60] animate-fade-in">
-            <div
-                class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-white/20 dark:border-zinc-800 animate-scale-up">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Confirm Subscription</h3>
-                    <div class="space-y-4">
-                        <p class="text-gray-700 dark:text-gray-300">Plan: <strong>{{ $selectedPlan->name }}</strong>
-                        </p>
-                        <p class="text-gray-700 dark:text-gray-300">Billing Cycle:
-                            <strong>{{ isset($selectedCycle) ? ucfirst($selectedCycle) : '' }}</strong>
-                        </p>
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select
-                                Business</label>
-                            <select wire:model="selectedBusinessId"
-                                class="w-full p-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700">
-                                <option value="">-- Select a business --</option>
-                                @foreach ($businesses as $business)
-                                    <option value="{{ $business->id }}">{{ $business->company_name }}</option>
-                                @endforeach
-                            </select>
-                            @error('selectedBusinessId')
-                                <span class="text-red-500 text-xs">{{ $message }}</span>
-                            @enderror
-                        </div>
-                        <p class="text-gray-700 dark:text-gray-300">Total: <strong
-                                class="text-indigo-600 dark:text-indigo-400">Rs
-                                {{ isset($selectedPrice) ? number_format($selectedPrice, 2) : '' }}</strong></p>
-                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">By confirming, you agree to the
-                            subscription terms. Your card will be charged accordingly.</p>
-                    </div>
-                    <div class="mt-6 flex justify-end gap-3">
-                        <button wire:click="cancelPlanConfirm"
-                            class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-zinc-600 transition">Cancel</button>
-                        <button wire:click="confirmPlanPurchase"
-                            class="px-6 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold shadow-md hover:shadow-lg transition">Confirm</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif
-
-    {{-- ── Confirmation Modal: Ad Credits ── --}}
-    @if (isset($showCreditConfirmModal) && $showCreditConfirmModal && isset($selectedCreditPlan) && $selectedCreditPlan)
-        @php
-            $modalFinalPrice = $selectedCreditPlan->price;
-            if ($selectedCreditPlan->discounted_percentage) {
-                $modalFinalPrice =
-                    ($selectedCreditPlan->price * (100 - $selectedCreditPlan->discounted_percentage)) / 100;
-            }
-        @endphp
-        <div
-            class="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-[60] animate-fade-in">
-            <div
-                class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl max-w-md w-full border border-white/20 dark:border-zinc-800 animate-scale-up">
-                <div class="p-6">
-                    <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Confirm Purchase</h3>
-
-                    @if ($processingPayment)
-                        {{-- Loading state while Stripe session is being created --}}
-                        <div class="flex flex-col items-center justify-center py-8 gap-4">
-                            <svg class="animate-spin h-10 w-10 text-amber-500" xmlns="http://www.w3.org/2000/svg"
-                                fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10"
-                                    stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor"
-                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                            </svg>
-                            <p class="text-gray-600 dark:text-gray-300 font-medium">Redirecting to payment...</p>
-                            <p class="text-xs text-gray-400">Please do not close this window.</p>
-                        </div>
-                    @else
-                        <div class="space-y-3">
-                            <p class="text-gray-700 dark:text-gray-300">Package:
-                                <strong>{{ $selectedCreditPlan->name }}</strong>
-                            </p>
-                            <p class="text-gray-700 dark:text-gray-300">Ad Credits:
-                                <strong>{{ $selectedCreditPlan->no_of_credits }}</strong>
-                            </p>
-
-                            <div class="space-y-2">
-                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Select
-                                    Business</label>
-                                <select wire:model="selectedBusinessIdForCredits"
-                                    class="w-full p-2 border rounded-lg dark:bg-zinc-800 dark:border-zinc-700">
-                                    <option value="">-- Select a business --</option>
-                                    @foreach ($businesses as $business)
-                                        <option value="{{ $business->id }}">{{ $business->company_name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('selectedBusinessIdForCredits')
-                                    <span class="text-red-500 text-xs">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <p class="text-gray-700 dark:text-gray-300">Total: <strong
-                                    class="text-amber-600 dark:text-amber-400">Rs
-                                    {{ number_format($modalFinalPrice, 2) }}</strong></p>
-
-                            <p class="text-xs text-gray-400 dark:text-gray-500">
-                                You will be redirected to Stripe's secure checkout to complete your payment.
-                            </p>
-                        </div>
-
-                        <div class="mt-6 flex justify-end gap-3">
-                            <button wire:click="cancelCreditConfirm"
-                                class="px-4 py-2 rounded-xl bg-gray-200 dark:bg-zinc-700 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-zinc-600 transition">
-                                Cancel
-                            </button>
-                            <button wire:click="confirmCreditPurchase" wire:loading.attr="disabled"
-                                class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold shadow-md hover:shadow-lg transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
-                                <span wire:loading.remove wire:target="confirmCreditPurchase">
-                                    <flux:icon.credit-card class="w-4 h-4 inline mr-1" />
-                                    Pay Now
-                                </span>
-                                <span wire:loading wire:target="confirmCreditPurchase"
-                                    class="flex items-center gap-2">
-                                    <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                        fill="none" viewBox="0 0 24 24">
-                                        <circle class="opacity-25" cx="12" cy="12" r="10"
-                                            stroke="currentColor" stroke-width="4"></circle>
-                                        <path class="opacity-75" fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                                    </svg>
-                                    Processing...
-                                </span>
-                            </button>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>

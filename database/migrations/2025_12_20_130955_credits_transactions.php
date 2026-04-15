@@ -10,7 +10,6 @@ return new class extends Migration
     {
         Schema::create('credits_transactions', function (Blueprint $table) {
             $table->id();
-
             $table->foreignId('business_id')
                 ->nullable()
                 ->constrained('businesses')
@@ -21,9 +20,9 @@ return new class extends Migration
                 ->constrained('vendors')
                 ->nullOnDelete();
 
-            $table->foreignId('credit_plan_id')
+            $table->foreignId('credit_id')
                 ->nullable()
-                ->constrained('credit_plans')
+                ->constrained('credits')
                 ->nullOnDelete();
 
 

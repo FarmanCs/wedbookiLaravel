@@ -2,12 +2,12 @@
 
 namespace Database\Factories\Subscription;
 
-use App\Models\Subscription\CreditPlan;
+use App\Models\Subscription\Credits;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class CreditPlanFactory extends Factory
+class CreditsFactory extends Factory
 {
-    protected $model = CreditPlan::class;
+    protected $model = Credits::class;
 
     public function definition(): array
     {
