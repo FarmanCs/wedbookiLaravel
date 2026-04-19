@@ -20,6 +20,8 @@ use App\Livewire\Vendor\VendorDetail;
 use App\Livewire\Venue\Detail;
 use Illuminate\Support\Facades\Auth;
 
+
+//this is the bulit in view for the larvel latter will replace by the project welcome page
 Route::get('/', function () {
     return view('welcome');
 })->name('home');

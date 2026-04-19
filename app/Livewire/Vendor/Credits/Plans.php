@@ -459,6 +459,17 @@ class Plans extends Component
                 'price' => $price,
             ];
             $this->selectedCreditsForPurchase = [];
+            // Reset temp values for clean state
+            $this->tempCreditId = null;
+            $this->tempPlanId = null;
+            $this->tempCycle = 'quarterly';
+        }
+
+        // For credit purchases, also reset temp plan values
+        if ($type === 'credit') {
+            $this->tempPlanId = null;
+            $this->tempCreditId = null;
+            $this->tempCycle = 'quarterly';
         }
 
         $this->showPurchaseModal = true;
@@ -485,8 +496,16 @@ class Plans extends Component
 
     public function addCreditToPurchase($id)
     {
+        if (empty($id)) {
+            session()->flash('error', 'Please select credits to add.');
+            return;
+        }
+
         $plan = collect($this->credits)->firstWhere('id', $id);
-        if (!$plan) return;
+        if (!$plan) {
+            session()->flash('error', 'Credits not found.');
+            return;
+        }
 
         $price = $plan->price;
         if ($plan->discounted_percentage > 0) {
@@ -505,6 +524,9 @@ class Plans extends Component
                 'credits' => $plan->no_of_credits,
             ];
         }
+
+        // Reset the temp credit ID after successful add
+        $this->tempCreditId = null;
     }
 
     public function updateCreditQuantity($index, $quantity)
@@ -519,8 +541,16 @@ class Plans extends Component
 
     public function selectPlanForPurchase($id, $cycle)
     {
+        if (empty($id)) {
+            session()->flash('error', 'Please select a plan.');
+            return;
+        }
+
         $plan = collect($this->plans)->firstWhere('id', $id);
-        if (!$plan) return;
+        if (!$plan) {
+            session()->flash('error', 'Plan not found.');
+            return;
+        }
 
         $basePrice = match ($cycle) {
             'monthly' => $plan->monthly_price,
@@ -543,6 +573,9 @@ class Plans extends Component
             'cycle' => $cycle,
             'price' => $price,
         ];
+
+        // Reset the temp plan ID after successful selection
+        $this->tempPlanId = null;
     }
 
     public function removePlanForPurchase()
